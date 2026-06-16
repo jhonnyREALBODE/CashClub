@@ -1,27 +1,2 @@
 [build]
-  publish = "."
-
-# Redireciona /members → login se não autenticado (feito no JS)
-# Redireciona rotas SPA
-[[redirects]]
-  from = "/app/*"
-  to = "/members.html"
-  status = 200
-
-[[redirects]]
-  from = "/painel/*"
-  to = "/admin.html"
-  status = 200
-
-# Headers de segurança
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-
-[[headers]]
-  for = "/js/*"
-  [headers.values]
-    Cache-Control = "public, max-age=3600"
+  publish = "cashclub"
