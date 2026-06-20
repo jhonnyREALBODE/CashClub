@@ -1,0 +1,2534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CashClub — Área de Membros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & TOKENS ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green:    #1AFF6B;
+  --green-d:  #0FCC55;
+  --green-xs: rgba(26,255,107,.06);
+  --bg:       #04080A;
+  --surf:     #0C1410;
+  --card:     #0E1712;
+  --border:   #182218;
+  --border-h: #243824;
+  --text:     #E8F0E9;
+  --text-2:   #9BB09E;
+  --text-3:   #5A7060;
+  --ff-h:     'Bricolage Grotesque', sans-serif;
+  --ff-b:     'Inter', sans-serif;
+  --sidebar-w: 260px;
+  --topbar-h:  56px;
+}
+html { height: 100%; }
+body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--ff-b);
+  font-size: 14px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── TOPBAR ───────────────────────────────────────────────── */
+.topbar {
+  height: var(--topbar-h);
+  background: var(--surf);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 50;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.logo-mark {
+  width: 28px; height: 28px;
+  background: var(--green);
+  border-radius: 6px;
+  display: grid; place-items: center;
+}
+.logo-mark svg { width:16px; height:16px; fill:#04080A; }
+.logo-name { font-family:var(--ff-h); font-size:17px; font-weight:800; color:var(--text); letter-spacing:-.4px; }
+
+.topbar-center { flex: 1; }
+
+.notif-btn {
+  position: relative;
+  width: 36px; height: 36px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid; place-items: center;
+  transition: border-color .2s;
+  flex-shrink: 0;
+}
+.notif-btn:hover { border-color: var(--border-h); }
+.notif-btn svg { width:18px; height:18px; stroke:var(--text-2); fill:none; stroke-width:1.6; }
+.notif-dot {
+  position: absolute;
+  top: 7px; right: 7px;
+  width: 7px; height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  border: 1.5px solid var(--surf);
+  animation: pulse 2s infinite;
+}
+
+.avatar-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  padding: 5px 10px 5px 5px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: border-color .2s, background .2s;
+  flex-shrink: 0;
+}
+.avatar-btn:hover { border-color:var(--border); background:var(--card); }
+.avatar { width:28px; height:28px; border-radius:50%; background:var(--green-xs); border:1px solid var(--border-h); display:grid; place-items:center; font-size:12px; font-weight:600; color:var(--green); flex-shrink:0; }
+.avatar-info { line-height:1.2; }
+.avatar-name { font-size:13px; font-weight:600; color:var(--text); }
+.avatar-plan { font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:.5px; }
+
+.plan-badge {
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.plan-badge.starter { background:rgba(100,150,255,.15); color:#7FA3FF; border:1px solid rgba(100,150,255,.25); }
+.plan-badge.pro     { background:rgba(255,170,0,.12); color:#FFAA00; border:1px solid rgba(255,170,0,.25); }
+.plan-badge.vip     { background:rgba(26,255,107,.12); color:var(--green); border:1px solid rgba(26,255,107,.25); }
+
+/* ── LAYOUT ───────────────────────────────────────────────── */
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ──────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--surf);
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border-h); border-radius: 4px; }
+
+.sidebar-section {
+  padding: 20px 12px 4px;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+
+.channel-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s;
+  position: relative;
+  text-decoration: none;
+  color: var(--text-2);
+}
+
+.channel-item:hover { background: var(--green-xs); color: var(--text); }
+.channel-item.active { background: rgba(26,255,107,.1); color: var(--text); }
+.channel-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 2px;
+  background: var(--green);
+  border-radius: 0 2px 2px 0;
+}
+
+.channel-logo {
+  width: 26px; height: 26px;
+  border-radius: 5px;
+  object-fit: contain;
+  background: var(--card);
+  padding: 2px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity .4s;
+}
+.channel-logo.loaded { opacity: 1; }
+.channel-logo-placeholder {
+  width: 26px; height: 26px;
+  border-radius: 5px;
+  background: var(--border-h);
+  flex-shrink: 0;
+  animation: shimmer 1.5s infinite;
+}
+
+.channel-name {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.channel-lock {
+  width: 14px; height: 14px;
+  stroke: var(--text-3);
+  fill: none;
+  stroke-width: 1.8;
+  flex-shrink: 0;
+}
+
+.channel-new {
+  min-width: 18px; height: 18px;
+  background: var(--green);
+  color: #04080A;
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 700;
+  display: grid; place-items: center;
+  padding: 0 5px;
+  flex-shrink: 0;
+}
+
+/* sidebar bottom nav */
+.sidebar-bottom {
+  position: fixed;
+  bottom: 0;
+  width: var(--sidebar-w);
+  border-top: 1px solid var(--border);
+  background: var(--surf);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background .15s, color .15s;
+  text-decoration: none;
+}
+.sidebar-nav-item:hover { background:var(--green-xs); color:var(--text); }
+.sidebar-nav-item svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.7; flex-shrink:0; }
+
+/* ── MAIN CONTENT ─────────────────────────────────────────── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.content::-webkit-scrollbar { width: 5px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--border-h); border-radius: 4px; }
+
+/* ── VIEWS (page transitions) ─────────────────────────────── */
+.view {
+  position: absolute;
+  inset: 0;
+  padding: 32px;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+  overflow-y: auto;
+}
+.view.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+/* ── HOME / CHANNEL GRID ──────────────────────────────────── */
+.view-home h2 {
+  font-family: var(--ff-h);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.view-home .sub {
+  color: var(--text-2);
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+
+.category-section { margin-bottom: 36px; }
+
+.category-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.category-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.league-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.league-card {
+  aspect-ratio: 1 / 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color .2s, transform .2s, background .2s;
+  position: relative;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.league-card:not(.locked):hover {
+  border-color: var(--border-h);
+  background: #111A14;
+  transform: translateY(-2px);
+}
+
+.league-card.locked {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.league-card img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity .5s;
+}
+.league-card img.loaded { opacity: 1; }
+
+.league-card-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.league-card .lock-overlay {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 20px; height: 20px;
+  background: var(--bg);
+  border-radius: 5px;
+  display: grid; place-items: center;
+}
+.league-card .lock-overlay svg { width:11px; height:11px; stroke:var(--text-3); fill:none; stroke-width:2; }
+
+/* ── SIGNAL FEED ──────────────────────────────────────────── */
+.feed-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.feed-header-logo {
+  width: 40px; height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: var(--card);
+  padding: 4px;
+  border: 1px solid var(--border);
+}
+.feed-header h2 {
+  font-family: var(--ff-h);
+  font-size: 22px;
+  font-weight: 700;
+}
+.feed-header .meta { color: var(--text-2); font-size: 13px; }
+
+.feed-search-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.feed-search-box {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  transition: border-color .2s;
+}
+.feed-search-box:focus-within { border-color: var(--green); }
+.feed-search-box svg { width: 15px; height: 15px; stroke: var(--text-3); fill: none; stroke-width: 1.8; flex-shrink: 0; }
+.feed-search-box input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--ff-b);
+  font-size: 13px;
+}
+.feed-search-box input::placeholder { color: var(--text-3); }
+.feed-analyst-select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text-2);
+  font-family: var(--ff-b);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color .2s;
+}
+.feed-analyst-select:focus { border-color: var(--green); }
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.filter-pill {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--ff-b);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .2s;
+}
+.filter-pill:hover, .filter-pill.active {
+  background: var(--green-xs);
+  border-color: rgba(26,255,107,.3);
+  color: var(--green);
+}
+
+/* skeleton */
+.skeleton-feed { display: flex; flex-direction: column; gap: 12px; }
+.skeleton-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  animation: shimmer 1.5s infinite;
+}
+.skel-line {
+  height: 12px;
+  background: var(--border-h);
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.skel-line.w60 { width: 60%; }
+.skel-line.w80 { width: 80%; }
+.skel-line.w40 { width: 40%; }
+
+/* signal card */
+.signal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  transition: border-color .2s;
+}
+.signal-card:hover { border-color: var(--border-h); }
+
+.signal-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.signal-league-logo {
+  width: 22px; height: 22px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: var(--surf);
+  padding: 2px;
+}
+.signal-league-name { font-size: 12px; color: var(--text-3); font-weight: 500; }
+.signal-time { margin-left: auto; font-size: 11px; color: var(--text-3); }
+.signal-vip-tag {
+  padding: 2px 6px;
+  background: rgba(26,255,107,.1);
+  border: 1px solid rgba(26,255,107,.2);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: .4px;
+}
+
+.signal-card-body { padding: 16px; }
+
+/* Signal image */
+.signal-image-wrap {
+  width: 100%;
+  max-height: 420px;
+  overflow: hidden;
+  cursor: zoom-in;
+  position: relative;
+  background: var(--surf);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.signal-image-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(28px) brightness(.55) saturate(1.2);
+  transform: scale(1.15);
+  z-index: 0;
+}
+.signal-image {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  display: block;
+  transition: transform .4s ease;
+  position: relative;
+  z-index: 1;
+}
+.signal-image-wrap:hover .signal-image { transform: scale(1.02); }
+.signal-image-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 75%, rgba(0,0,0,.2) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Lightbox */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4,8,10,.92);
+  z-index: 999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  cursor: zoom-out;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.lightbox-overlay.open {
+  display: flex;
+  opacity: 1;
+}
+.lightbox-overlay img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  transform: scale(.95);
+  transition: transform .25s ease;
+}
+.lightbox-overlay.open img { transform: scale(1); }
+.lightbox-close {
+  position: fixed;
+  top: 24px; right: 24px;
+  width: 40px; height: 40px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.signal-match {
+  font-family: var(--ff-h);
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.signal-metrics {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-width: 80px;
+}
+.metric-label { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .6px; }
+.metric-value { font-family: var(--ff-h); font-size: 18px; font-weight: 700; color: var(--text); }
+.metric-value.green { color: var(--green); }
+
+.signal-market {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.signal-analysis {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 12px;
+  display: none;
+}
+.signal-analysis.open { display: block; }
+.toggle-analysis {
+  font-size: 12px;
+  color: var(--green);
+  cursor: pointer;
+  font-weight: 500;
+  background: none; border: none;
+  padding: 0;
+  margin-bottom: 12px;
+}
+
+.signal-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.analyst-avatar-sm {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--border-h);
+  display: grid; place-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--green);
+  flex-shrink: 0;
+}
+.analyst-name-sm { font-size: 12px; color: var(--text-3); }
+.signal-status {
+  margin-left: auto;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+.signal-status.pending { background:rgba(150,150,150,.1); color:var(--text-3); border:1px solid var(--border); }
+.signal-status.green   { background:rgba(26,255,107,.12); color:var(--green); border:1px solid rgba(26,255,107,.25); }
+.signal-status.red     { background:rgba(255,60,60,.12); color:#FF6B6B; border:1px solid rgba(255,60,60,.25); }
+.signal-status.void    { background:rgba(150,120,0,.12); color:#FFBB33; border:1px solid rgba(255,180,0,.25); }
+
+/* Entry tracking */
+.signal-entry-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surf);
+}
+.signal-entry-label {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-right: auto;
+}
+.entry-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  font-family: var(--ff-b);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.entry-btn.yes.active { background: rgba(26,255,107,.14); border-color: rgba(26,255,107,.35); color: var(--green); }
+.entry-btn.no.active { background: rgba(255,60,60,.1); border-color: rgba(255,60,60,.3); color: #FF6B6B; }
+.entry-btn:hover:not(.active) { border-color: var(--border-h); color: var(--text); }
+.entry-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.2; vertical-align: -1px; margin-right: 4px; }
+
+/* ── COUNTDOWN / URGENCY TAG ──────────────────────────────── */
+.signal-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  background: rgba(255,170,0,.1);
+  color: #FFAA33;
+  border: 1px solid rgba(255,170,0,.2);
+}
+.signal-countdown.urgent {
+  background: rgba(255,60,60,.12);
+  color: #FF6B6B;
+  border-color: rgba(255,60,60,.25);
+  animation: urgentPulse 1.6s infinite;
+}
+.signal-countdown.started {
+  background: rgba(150,150,150,.1);
+  color: var(--text-3);
+  border-color: var(--border);
+}
+.signal-countdown svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; }
+@keyframes urgentPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .55; }
+}
+
+/* ── SOCIAL: LIKES + COMMENTS ─────────────────────────────── */
+.signal-social-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+}
+.social-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  font-family: var(--ff-b);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.social-btn:hover { background: var(--green-xs); color: var(--text-2); }
+.social-btn.liked { color: var(--green); }
+.social-btn svg {
+  width: 16px; height: 16px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8;
+  transition: transform .2s;
+}
+.social-btn.liked svg { fill: var(--green); stroke: var(--green); }
+.social-btn:active svg { transform: scale(1.25); }
+
+.signal-comments-section {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+}
+.signal-comments-section.open { display: block; }
+
+.comment-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.comment-input-row input {
+  flex: 1;
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-family: var(--ff-b);
+  font-size: 13px;
+  outline: none;
+  transition: border-color .2s;
+}
+.comment-input-row input:focus { border-color: var(--green); }
+.comment-input-row input::placeholder { color: var(--text-3); }
+.comment-send-btn {
+  padding: 8px 14px;
+  background: var(--green);
+  border: none;
+  border-radius: 8px;
+  color: #04080A;
+  font-family: var(--ff-b);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.comment-send-btn:hover { background: var(--green-d); }
+.comment-send-btn:disabled { opacity: .5; pointer-events: none; }
+
+.comment-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.comment-item:last-child { margin-bottom: 0; }
+.comment-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--green-xs);
+  border: 1px solid var(--border-h);
+  display: grid; place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.comment-body { flex: 1; min-width: 0; }
+.comment-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+.comment-author { font-size: 12px; font-weight: 700; color: var(--text); }
+.comment-time { font-size: 11px; color: var(--text-3); }
+.comment-text { font-size: 13px; color: var(--text-2); line-height: 1.5; word-break: break-word; }
+.comment-delete {
+  margin-left: auto;
+  background: none; border: none;
+  color: var(--text-3);
+  font-size: 11px;
+  cursor: pointer;
+  opacity: .6;
+  transition: opacity .2s, color .2s;
+  flex-shrink: 0;
+}
+.comment-delete:hover { opacity: 1; color: #FF6B6B; }
+.comments-empty { font-size: 12px; color: var(--text-3); text-align: center; padding: 8px 0; }
+.comments-loading { font-size: 12px; color: var(--text-3); text-align: center; padding: 8px 0; }
+
+/* ── VIP CHAT ─────────────────────────────────────────────── */
+.vipchat-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 32px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.vipchat-header-icon {
+  width: 40px; height: 40px;
+  background: rgba(26,255,107,.1);
+  border: 1px solid rgba(26,255,107,.25);
+  border-radius: 10px;
+  display: grid; place-items: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.vipchat-header-title { font-family: var(--ff-h); font-size: 20px; font-weight: 700; }
+.vipchat-header-sub { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+
+.vipchat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vipchat-msg {
+  display: flex;
+  gap: 10px;
+  max-width: 580px;
+}
+.vipchat-msg.mine { align-self: flex-end; flex-direction: row-reverse; }
+.vipchat-msg-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--green-xs);
+  border: 1px solid var(--border-h);
+  display: grid; place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.vipchat-msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.vipchat-msg-body { min-width: 0; }
+.vipchat-msg.mine .vipchat-msg-body { display: flex; flex-direction: column; align-items: flex-end; }
+.vipchat-msg-head { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
+.vipchat-msg.mine .vipchat-msg-head { flex-direction: row-reverse; }
+.vipchat-msg-author { font-size: 12px; font-weight: 700; color: var(--text); }
+.vipchat-msg-author.admin-author { color: var(--green); }
+.vipchat-msg-time { font-size: 10px; color: var(--text-3); }
+.vipchat-msg-bubble {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 9px 13px;
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.5;
+  word-break: break-word;
+}
+.vipchat-msg.mine .vipchat-msg-bubble {
+  background: rgba(26,255,107,.1);
+  border-color: rgba(26,255,107,.25);
+  color: var(--text);
+}
+
+.vipchat-input-row {
+  display: flex;
+  gap: 10px;
+  padding: 16px 32px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.vipchat-input-row input {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: var(--ff-b);
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s;
+}
+.vipchat-input-row input:focus { border-color: var(--green); }
+.vipchat-send-btn {
+  width: 44px; height: 44px;
+  background: var(--green);
+  border: none;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  cursor: pointer;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.vipchat-send-btn:hover { background: var(--green-d); }
+.vipchat-send-btn svg { width: 18px; height: 18px; stroke: #04080A; fill: none; stroke-width: 2; }
+
+@media (max-width: 768px) {
+  .vipchat-header, .vipchat-messages, .vipchat-input-row { padding-left: 16px; padding-right: 16px; }
+}
+
+/* ── ROI VIEW ─────────────────────────────────────────────── */
+.roi-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.roi-stat {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+.roi-stat-label { font-size: 11px; color: var(--text-3); font-weight: 600; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+.roi-stat-value { font-family: var(--ff-h); font-size: 26px; font-weight: 700; }
+.roi-stat-value.pos { color: var(--green); }
+.roi-stat-value.neg { color: #FF6B6B; }
+
+/* ── PROFILE VIEW ─────────────────────────────────────────── */
+.profile-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 520px;
+  margin-bottom: 20px;
+}
+.profile-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--green-xs);
+  border: 2px solid rgba(26,255,107,.3);
+  display: grid; place-items: center;
+  font-family: var(--ff-h);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.profile-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.profile-avatar-edit {
+  position: absolute;
+  inset: 0;
+  background: rgba(4,8,10,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.profile-avatar:hover .profile-avatar-edit { opacity: 1; }
+.profile-avatar-edit svg { width: 16px; height: 16px; stroke: var(--text); fill: none; stroke-width: 1.8; }
+.profile-avatar.uploading { pointer-events: none; }
+.profile-avatar.uploading .profile-avatar-edit {
+  opacity: 1;
+  background: rgba(4,8,10,.7);
+}
+.avatar-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.25);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: avatarspin .7s linear infinite;
+}
+@keyframes avatarspin { to { transform: rotate(360deg); } }
+.profile-name { font-family:var(--ff-h); font-size:20px; font-weight:700; margin-bottom:4px; }
+.profile-email { color:var(--text-2); font-size:13px; margin-bottom:20px; }
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.profile-row:last-child { border-bottom: none; }
+.profile-row-label { color: var(--text-2); }
+.profile-row-value { font-weight: 600; }
+.btn-danger {
+  padding: 10px 18px;
+  background: rgba(255,60,60,.1);
+  border: 1px solid rgba(255,60,60,.25);
+  border-radius: 8px;
+  color: #FF6B6B;
+  font-family: var(--ff-b);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+  margin-top: 16px;
+}
+.btn-danger:hover { background: rgba(255,60,60,.18); }
+
+/* ── SPORTS SELECTOR (Starter plan) ───────────────────────── */
+.sports-selector-title {
+  font-family: var(--ff-h);
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.sports-selector-sub {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+.sport-option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.sport-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.sport-option:hover { border-color: var(--border-h); }
+.sport-option.selected {
+  border-color: var(--green);
+  background: rgba(26,255,107,.06);
+}
+.sport-option-icon { font-size: 26px; line-height: 1; }
+.sport-option-name { font-size: 12px; font-weight: 600; color: var(--text-2); }
+.sport-option.selected .sport-option-name { color: var(--text); }
+.sport-option-check {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: grid; place-items: center;
+  transition: all .2s;
+}
+.sport-option.selected .sport-option-check {
+  background: var(--green);
+  border-color: var(--green);
+}
+.sport-option-check svg { width: 10px; height: 10px; stroke: #04080A; fill: none; stroke-width: 3; opacity: 0; }
+.sport-option.selected .sport-option-check svg { opacity: 1; }
+
+.sports-selector-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sports-selector-count { font-size: 12px; color: var(--text-3); margin-right: auto; }
+.sports-selector-count strong { color: var(--green); }
+
+/* ── LOCKED CHANNEL UPSELL ────────────────────────────────── */
+.upsell-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.upsell-card svg.lock-big { width:48px; height:48px; stroke:var(--text-3); fill:none; stroke-width:1.4; margin-bottom:16px; }
+.upsell-card h3 { font-family:var(--ff-h); font-size:20px; font-weight:700; margin-bottom:8px; }
+.upsell-card p { color:var(--text-2); font-size:14px; margin-bottom:24px; line-height:1.6; }
+.btn-upgrade {
+  display: inline-block;
+  padding: 12px 28px;
+  background: var(--green);
+  color: #04080A;
+  font-family: var(--ff-b);
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background .2s;
+  border: none;
+  cursor: pointer;
+}
+.btn-upgrade:hover { background: var(--green-d); }
+
+/* ── NOTIFICATION PANEL ───────────────────────────────────── */
+.notif-panel {
+  position: fixed;
+  top: var(--topbar-h);
+  right: 0;
+  width: 320px;
+  background: var(--surf);
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0 0 0 12px;
+  max-height: 70vh;
+  overflow-y: auto;
+  z-index: 100;
+  transform: translateX(100%);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+}
+.notif-panel.open { transform: translateX(0); }
+.notif-panel-header { padding: 16px; border-bottom:1px solid var(--border); font-weight:600; font-size:14px; }
+.notif-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .15s;
+}
+.notif-item:hover { background: var(--green-xs); }
+.notif-item:last-child { border-bottom: none; }
+.notif-item-title { font-size:13px; font-weight:600; margin-bottom:3px; }
+.notif-item-body { font-size:12px; color:var(--text-2); }
+.notif-item-time { font-size:11px; color:var(--text-3); margin-top:4px; }
+.notif-item.unread .notif-item-title::before {
+  content: '●';
+  color: var(--green);
+  font-size: 8px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* ── TOASTS ───────────────────────────────────────────────── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 999;
+  pointer-events: none;
+}
+.toast {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 280px;
+  transform: translateX(120%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  pointer-events: all;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.toast.show { transform: translateX(0); }
+.toast-icon { width:8px; height:8px; border-radius:50%; background:var(--green); flex-shrink:0; }
+.toast-icon.red { background:#FF6B6B; }
+.toast-text { font-size:13px; font-weight:500; }
+.toast-sub { font-size:11px; color:var(--text-2); margin-top:1px; }
+
+/* ── EMPTY STATE ──────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-2);
+}
+.empty-state svg { width:48px; height:48px; stroke:var(--text-3); fill:none; stroke-width:1.3; margin-bottom:16px; }
+.empty-state h3 { font-family:var(--ff-h); font-size:18px; font-weight:600; color:var(--text); margin-bottom:6px; }
+.empty-state p { font-size:14px; }
+
+/* ── UTILITIES ────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%,100% { opacity:.5; }
+  50% { opacity:1; }
+}
+@keyframes pulse {
+  0%,100% { transform:scale(1); opacity:1; }
+  50% { transform:scale(1.3); opacity:.7; }
+}
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.fade-in { animation: fadeIn .35s ease forwards; }
+
+/* mobile sidebar toggle */
+.menu-toggle { display:none; background:none; border:none; cursor:pointer; padding:4px; }
+.menu-toggle svg { width:22px; height:22px; stroke:var(--text-2); fill:none; stroke-width:1.8; }
+
+@media (max-width: 768px) {
+  :root { --sidebar-w: 240px; }
+  .sidebar {
+    position: fixed;
+    left: 0; top: var(--topbar-h); bottom: 0;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .menu-toggle { display: block; }
+  .view { padding: 20px 16px; }
+  .content { position: relative; }
+  .avatar-info { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <button class="menu-toggle" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <a href="#" class="logo" onclick="showView('home')">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="logo-name">CashClub</span>
+  </a>
+  <div class="topbar-center"></div>
+  <button class="notif-btn" onclick="toggleNotif()" id="notif-btn">
+    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="notif-dot" id="notif-dot" style="display:none"></span>
+  </button>
+  <div class="avatar-btn" onclick="showView('profile')" id="avatar-btn">
+    <div class="avatar" id="avatar-initials">?</div>
+    <div class="avatar-info">
+      <div class="avatar-name" id="topbar-name">—</div>
+      <div class="avatar-plan" id="topbar-plan">—</div>
+    </div>
+  </div>
+  <span class="plan-badge" id="topbar-badge" style="display:none"></span>
+</header>
+
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="section-label">Início</div>
+      <div class="channel-item active" onclick="showView('home')" id="nav-home">
+        <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;flex-shrink:0" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="channel-name">Todos os canais</span>
+      </div>
+      <div class="channel-item" onclick="showView('roi')" id="nav-roi">
+        <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;flex-shrink:0" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span class="channel-name">Meu ROI</span>
+      </div>
+      <div class="channel-item" onclick="showView('vipchat')" id="nav-vipchat" style="display:none">
+        <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;flex-shrink:0" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="channel-name">Chat VIP</span>
+      </div>
+    </div>
+
+    <div id="sidebar-leagues"></div>
+
+    <div class="sidebar-bottom">
+      <a class="sidebar-nav-item" onclick="showView('profile')">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Minha conta
+      </a>
+      <a class="sidebar-nav-item" onclick="signOut()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </a>
+    </div>
+  </nav>
+
+  <!-- CONTENT AREA -->
+  <main class="content" id="content">
+
+    <!-- HOME VIEW -->
+    <div class="view active" id="view-home">
+      <h2>Olá, <span id="home-name">—</span> 👋</h2>
+      <p class="sub">Escolha uma liga para ver os sinais</p>
+      <div id="league-categories"></div>
+    </div>
+
+    <!-- CHANNEL / FEED VIEW -->
+    <div class="view" id="view-channel">
+      <div class="feed-header">
+        <img class="feed-header-logo" id="feed-logo" src="" alt="">
+        <div>
+          <h2 id="feed-title">—</h2>
+          <div class="meta" id="feed-meta">—</div>
+        </div>
+      </div>
+      <div class="feed-search-row">
+        <div class="feed-search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="feed-search" placeholder="Buscar time ou jogo…" oninput="applyFeedFilters()">
+        </div>
+        <select id="feed-analyst-filter" class="feed-analyst-select" onchange="applyFeedFilters()">
+          <option value="">Todos os analistas</option>
+        </select>
+      </div>
+      <div class="filter-row">
+        <button class="filter-pill active" onclick="filterFeed('all',this)">Todos</button>
+        <button class="filter-pill" onclick="filterFeed('pending',this)">Pendentes</button>
+        <button class="filter-pill" onclick="filterFeed('green',this)">✅ Green</button>
+        <button class="filter-pill" onclick="filterFeed('red',this)">❌ Red</button>
+      </div>
+      <div id="feed-content"></div>
+    </div>
+
+    <!-- LOCKED VIEW -->
+    <div class="view" id="view-locked">
+      <div class="upsell-card">
+        <svg class="lock-big" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <h3 id="lock-title">Liga bloqueada</h3>
+        <p id="lock-body">Seu plano atual não inclui acesso a este canal. Faça upgrade para desbloquear.</p>
+        <a href="/#planos" class="btn-upgrade">Ver planos</a>
+      </div>
+    </div>
+
+    <!-- ROI VIEW -->
+    <div class="view" id="view-roi">
+      <h2 style="font-family:var(--ff-h);font-size:24px;font-weight:700;margin-bottom:4px">Meu ROI</h2>
+      <p style="color:var(--text-2);font-size:14px;margin-bottom:28px">Histórico acumulado de resultados</p>
+      <div class="roi-stats" id="roi-stats"></div>
+      <div id="roi-history"></div>
+    </div>
+
+    <!-- VIP CHAT VIEW -->
+    <div class="view" id="view-vipchat" style="padding:0;display:flex;flex-direction:column">
+      <div class="vipchat-header">
+        <div class="vipchat-header-icon">⚡</div>
+        <div>
+          <h2 class="vipchat-header-title">Chat VIP</h2>
+          <p class="vipchat-header-sub">Converse direto com os analistas e outros membros VIP</p>
+        </div>
+      </div>
+      <div class="vipchat-messages" id="vipchat-messages"></div>
+      <div class="vipchat-input-row">
+        <input type="text" id="vipchat-input" placeholder="Escreva uma mensagem…" onkeydown="if(event.key==='Enter')sendVipChatMessage()">
+        <button class="vipchat-send-btn" onclick="sendVipChatMessage()">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- PROFILE VIEW -->
+    <div class="view" id="view-profile">
+      <h2 style="font-family:var(--ff-h);font-size:24px;font-weight:700;margin-bottom:24px">Minha Conta</h2>
+      <div class="profile-card" id="profile-card"></div>
+      <div class="profile-card" id="sports-selector-card" style="display:none"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-panel-header">Notificações</div>
+  <div id="notif-list"></div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<script>
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let STATE = {
+  profile: null,
+  leagues: [],
+  currentLeagueId: null,
+  signals: [],
+  feedFilter: 'all',
+  notifOpen: false,
+  sidebarOpen: false,
+  entries: {}, // { signal_id: true|false }
+  likesCount: {}, // { signal_id: count }
+  myLikes: {}, // { signal_id: true }
+  commentsCount: {}, // { signal_id: count }
+  countdownInterval: null,
+};
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+async function init() {
+  // Auth guard
+  const user = await getCurrentUser();
+  if (!user) return window.location.href = '/login.html';
+
+  // Load profile
+  const profile = await getCurrentProfile();
+  if (!profile) return window.location.href = '/login.html';
+  if (profile.is_admin) return window.location.href = '/admin.html';
+  STATE.profile = profile;
+
+  // Render topbar
+  renderTopbar(profile);
+
+  // Load leagues
+  const { data: leagues } = await sb.from('leagues').select('*').eq('active', true).order('sort_order');
+  STATE.leagues = leagues || [];
+
+  // Build sidebar + home grid
+  renderSidebarLeagues();
+  renderHomeGrid();
+
+  // Load ROI
+  loadROI();
+
+  // Realtime: new signals
+  sb.channel('signals')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'signals' }, payload => {
+      handleNewSignal(payload.new);
+    })
+    .subscribe();
+
+  // Load notifications
+  loadNotifications();
+}
+
+// ═══════════════════════════════════════════════════
+// TOPBAR
+// ═══════════════════════════════════════════════════
+function renderTopbar(profile) {
+  const name = profile.full_name || profile.email.split('@')[0];
+  document.getElementById('home-name').textContent = name.split(' ')[0];
+  document.getElementById('topbar-name').textContent = name;
+  document.getElementById('topbar-plan').textContent = planLabel(profile.plan);
+
+  document.getElementById('nav-vipchat').style.display = profile.plan === 'vip' ? '' : 'none';
+
+  const topbarAvatar = document.getElementById('avatar-initials');
+  if (profile.avatar_url) {
+    topbarAvatar.innerHTML = `<img src="${profile.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  } else {
+    topbarAvatar.textContent = name[0].toUpperCase();
+  }
+
+  const badge = document.getElementById('topbar-badge');
+  if (profile.plan !== 'free') {
+    badge.textContent = planLabel(profile.plan);
+    badge.className = `plan-badge ${profile.plan}`;
+    badge.style.display = '';
+  }
+
+  // Profile card
+  const card = document.getElementById('profile-card');
+  const avatarContent = profile.avatar_url
+    ? `<img src="${profile.avatar_url}" alt="">`
+    : name[0].toUpperCase();
+
+  card.innerHTML = `
+    <div class="profile-avatar" id="profile-avatar-box" onclick="document.getElementById('avatar-input').click()">
+      ${avatarContent}
+      <div class="profile-avatar-edit">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      </div>
+    </div>
+    <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+    <div class="profile-name">${name}</div>
+    <div class="profile-email">${profile.email}</div>
+    <div class="profile-row"><span class="profile-row-label">Plano atual</span><span class="profile-row-value">${planLabel(profile.plan)}</span></div>
+    <div class="profile-row"><span class="profile-row-label">Membro desde</span><span class="profile-row-value">${fmtDate(profile.created_at)}</span></div>
+    <div class="profile-row"><span class="profile-row-label">Plano válido até</span><span class="profile-row-value">${profile.plan_expires_at ? fmtDate(profile.plan_expires_at) : '—'}</span></div>
+    <div class="profile-row"><span class="profile-row-label">Email</span><span class="profile-row-value">${profile.email}</span></div>
+    <button class="btn-danger" onclick="signOut()">Sair da conta</button>
+    <a href="/#planos" style="display:inline-block;margin-top:10px;margin-left:12px;font-size:13px;color:var(--green);text-decoration:none;font-weight:500">Gerenciar assinatura →</a>
+  `;
+
+  renderSportsSelector(profile);
+}
+
+const SPORT_OPTIONS_BY_PLAN = {
+  starter: {
+    limit: 2,
+    options: [
+      { key: 'football', label: 'Futebol', icon: '⚽' },
+      { key: 'basketball', label: 'Basquete (NBA)', icon: '🏀' },
+      { key: 'baseball', label: 'Beisebol (MLB)', icon: '⚾' },
+    ],
+  },
+  pro: {
+    limit: 4,
+    options: [
+      { key: 'football', label: 'Futebol', icon: '⚽' },
+      { key: 'basketball', label: 'Basquete (NBA)', icon: '🏀' },
+      { key: 'baseball', label: 'Beisebol (MLB)', icon: '⚾' },
+      { key: 'esports', label: 'E-Sports', icon: '🎮' },
+    ],
+  },
+};
+
+function renderSportsSelector(profile) {
+  const wrap = document.getElementById('sports-selector-card');
+  const config = SPORT_OPTIONS_BY_PLAN[profile.plan];
+  if (!config) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = '';
+
+  const fieldName = profile.plan === 'starter' ? 'starter_categories' : 'pro_categories';
+  const selected = new Set(profile[fieldName] || []);
+  const limit = config.limit;
+  const allSelected = selected.size === config.options.length; // Pro com 4/4 opções = sem escolha real
+
+  wrap.innerHTML = `
+    <div class="sports-selector-title">Meus esportes</div>
+    <div class="sports-selector-sub">Seu plano ${planLabel(profile.plan)} dá acesso a ${limit} esporte${limit > 1 ? 's' : ''} completo${limit > 1 ? 's' : ''}. Escolha quais você quer acompanhar.</div>
+    <div class="sport-option-grid" data-limit="${limit}">
+      ${config.options.map(s => `
+        <div class="sport-option ${selected.has(s.key) ? 'selected' : ''}" data-sport="${s.key}" onclick="toggleSportOption(this)">
+          <span class="sport-option-icon">${s.icon}</span>
+          <span class="sport-option-name">${s.label}</span>
+          <div class="sport-option-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>`).join('')}
+    </div>
+    <div class="sports-selector-footer">
+      <span class="sports-selector-count" id="sports-count-label"><strong>${selected.size}</strong>/${limit} selecionados</span>
+      <button class="btn-primary" id="btn-save-sports" style="width:auto;padding:10px 20px;margin:0" onclick="saveSportsSelection()">Salvar escolha</button>
+    </div>
+  `;
+}
+
+function toggleSportOption(el) {
+  const grid = el.closest('.sport-option-grid');
+  const limit = parseInt(grid.dataset.limit);
+  const selectedEls = grid.querySelectorAll('.sport-option.selected');
+  const isSelected = el.classList.contains('selected');
+
+  if (!isSelected && selectedEls.length >= limit) {
+    showToast('Limite atingido', `Seu plano permite escolher só ${limit} esporte${limit > 1 ? 's' : ''}`);
+    return;
+  }
+
+  el.classList.toggle('selected');
+  const count = grid.querySelectorAll('.sport-option.selected').length;
+  document.getElementById('sports-count-label').innerHTML = `<strong>${count}</strong>/${limit} selecionados`;
+}
+
+async function saveSportsSelection() {
+  const grid = document.querySelector('.sport-option-grid');
+  const limit = parseInt(grid.dataset.limit);
+  const selectedEls = grid.querySelectorAll('.sport-option.selected');
+  const categories = Array.from(selectedEls).map(el => el.dataset.sport);
+
+  if (categories.length !== limit) {
+    showToast(`Escolha ${limit} esportes`, `Selecione exatamente ${limit} para continuar`);
+    return;
+  }
+
+  const btn = document.getElementById('btn-save-sports');
+  btn.textContent = 'Salvando…';
+  btn.disabled = true;
+
+  const fieldName = STATE.profile.plan === 'starter' ? 'starter_categories' : 'pro_categories';
+  const { error } = await sb.from('profiles').update({ [fieldName]: categories }).eq('id', STATE.profile.id);
+
+  btn.textContent = 'Salvar escolha';
+  btn.disabled = false;
+
+  if (error) {
+    showToast('Erro ao salvar', error.message);
+    return;
+  }
+
+  STATE.profile[fieldName] = categories;
+  showToast('Esportes atualizados', 'Sua escolha foi salva com sucesso');
+  renderSidebarLeagues();
+  renderHomeGrid();
+}
+
+async function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 3 * 1024 * 1024) {
+    showToast('Imagem muito grande', 'Máximo 3MB');
+    return;
+  }
+
+  const box = document.getElementById('profile-avatar-box');
+  box.classList.add('uploading');
+  const editIcon = box.querySelector('.profile-avatar-edit');
+  editIcon.innerHTML = '<div class="avatar-spinner"></div>';
+
+  try {
+    const ext = file.name.split('.').pop();
+    const fileName = `avatar-${STATE.profile.id}-${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await sb.storage.from('signal-images').upload(fileName, file);
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = sb.storage.from('signal-images').getPublicUrl(fileName);
+    const avatarUrl = urlData.publicUrl;
+
+    const { error: updateError } = await sb.from('profiles').update({ avatar_url: avatarUrl }).eq('id', STATE.profile.id);
+    if (updateError) throw updateError;
+
+    STATE.profile.avatar_url = avatarUrl;
+    renderTopbar(STATE.profile);
+    showToast('Foto atualizada', 'Sua foto de perfil foi salva');
+
+  } catch (err) {
+    showToast('Erro ao enviar foto', err.message);
+    box.classList.remove('uploading');
+    editIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// ACCESS CHECK
+// ═══════════════════════════════════════════════════
+function hasAccess(league) {
+  const plan = STATE.profile.plan;
+  if (plan === 'vip') return true;
+  if (plan === 'pro') return STATE.profile.pro_categories?.includes(league.category);
+  if (plan === 'starter') return STATE.profile.starter_categories?.includes(league.category);
+  return false;
+}
+
+// ═══════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════
+const CATEGORY_LABELS = {
+  football:   '⚽  Futebol',
+  basketball: '🏀  Basquete',
+  baseball:   '⚾  Beisebol',
+  tennis:     '🎾  Tênis',
+  esports:    '🎮  E-Sports',
+};
+
+function renderSidebarLeagues() {
+  const categories = ['football','basketball','baseball','tennis','esports'];
+  let html = '';
+  categories.forEach(cat => {
+    const leagues = STATE.leagues.filter(l => l.category === cat);
+    if (!leagues.length) return;
+    html += `<div class="sidebar-section">
+      <div class="section-label">${CATEGORY_LABELS[cat]}</div>`;
+    leagues.forEach(l => {
+      const access = hasAccess(l);
+      html += `
+        <div class="channel-item${access ? '' : ' locked'}" id="nav-${l.id}" onclick="${access ? `openChannel('${l.id}')` : `showLocked('${l.id}')`}">
+          ${l.logo_url
+            ? `<img class="channel-logo" src="${l.logo_url}" alt="${l.name}" onload="this.classList.add('loaded')" onerror="this.outerHTML='<div class=channel-logo-placeholder></div>'">`
+            : `<div class="channel-logo-placeholder"></div>`}
+          <span class="channel-name">${l.name}</span>
+          ${!access ? `<svg class="channel-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>` : ''}
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('sidebar-leagues').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// HOME GRID
+// ═══════════════════════════════════════════════════
+function renderHomeGrid() {
+  const categories = ['football','basketball','baseball','tennis','esports'];
+  let html = '';
+  categories.forEach(cat => {
+    const leagues = STATE.leagues.filter(l => l.category === cat);
+    if (!leagues.length) return;
+    html += `<div class="category-section">
+      <div class="category-title">${CATEGORY_LABELS[cat]}</div>
+      <div class="league-grid">`;
+    leagues.forEach(l => {
+      const access = hasAccess(l);
+      html += `
+        <div class="league-card${access ? '' : ' locked'}" onclick="${access ? `openChannel('${l.id}')` : `showLocked('${l.id}')`}" style="animation:fadeIn .4s ease ${leagues.indexOf(l) * .05}s both">
+          ${l.logo_url
+            ? `<img src="${l.logo_url}" alt="${l.name}" onload="this.classList.add('loaded')" onerror="this.style.display='none'">`
+            : `<div style="width:56px;height:56px;background:var(--border-h);border-radius:8px"></div>`}
+          <span class="league-card-name">${l.name}</span>
+          ${!access ? `<div class="lock-overlay"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>` : ''}
+        </div>`;
+    });
+    html += `</div></div>`;
+  });
+  document.getElementById('league-categories').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// CHANNEL / FEED
+// ═══════════════════════════════════════════════════
+async function openChannel(leagueId) {
+  STATE.currentLeagueId = leagueId;
+  STATE.feedFilter = 'all';
+  const league = STATE.leagues.find(l => l.id === leagueId);
+  if (!league) return;
+
+  // Update sidebar active
+  document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById(`nav-${leagueId}`);
+  if (navEl) navEl.classList.add('active');
+  document.getElementById('nav-home').classList.remove('active');
+  document.getElementById('nav-roi').classList.remove('active');
+
+  // Feed header
+  document.getElementById('feed-logo').src = league.logo_url || '';
+  document.getElementById('feed-title').textContent = league.name;
+  document.getElementById('feed-meta').textContent = 'Sinais publicados';
+
+  // Reset filter pills and search
+  document.querySelectorAll('.filter-pill').forEach((p,i) => p.classList.toggle('active', i===0));
+  document.getElementById('feed-search').value = '';
+  document.getElementById('feed-analyst-filter').value = '';
+
+  showView('channel');
+  renderSkeletons();
+
+  // Fetch signals
+  const now = new Date().toISOString();
+  let query = sb.from('signals')
+    .select('*, analysts(name, handle)')
+    .eq('league_id', leagueId)
+    .order('published_at', { ascending: false })
+    .limit(50);
+
+  // VIP early access: se não for VIP, só vê após vip_early_access_until
+  if (STATE.profile.plan !== 'vip') {
+    query = query.or(`vip_early_access_until.is.null,vip_early_access_until.lt.${now}`);
+  }
+
+  const { data: signals } = await query;
+  STATE.signals = signals || [];
+
+  // Carrega o que o membro já marcou (entrei/não entrei) para esses sinais
+  if (STATE.signals.length) {
+    const signalIds = STATE.signals.map(s => s.id);
+
+    const { data: entries } = await sb.from('member_roi')
+      .select('signal_id, entered')
+      .eq('user_id', STATE.profile.id)
+      .in('signal_id', signalIds);
+    (entries || []).forEach(e => { STATE.entries[e.signal_id] = e.entered; });
+
+    // Carrega curtidas (todas, pra contar e saber se o membro já curtiu)
+    const { data: likes } = await sb.from('signal_likes')
+      .select('signal_id, user_id')
+      .in('signal_id', signalIds);
+    STATE.likesCount = {};
+    STATE.myLikes = {};
+    (likes || []).forEach(l => {
+      STATE.likesCount[l.signal_id] = (STATE.likesCount[l.signal_id] || 0) + 1;
+      if (l.user_id === STATE.profile.id) STATE.myLikes[l.signal_id] = true;
+    });
+
+    // Carrega contagem de comentários
+    const { data: comments } = await sb.from('signal_comments')
+      .select('signal_id')
+      .in('signal_id', signalIds);
+    STATE.commentsCount = {};
+    (comments || []).forEach(c => {
+      STATE.commentsCount[c.signal_id] = (STATE.commentsCount[c.signal_id] || 0) + 1;
+    });
+  }
+
+  populateAnalystFilter(STATE.signals);
+  renderFeed(STATE.signals);
+  startCountdownTicker();
+
+  // Close sidebar on mobile
+  if (window.innerWidth < 768) toggleSidebar(false);
+}
+
+async function setEntry(signalId, entered, btn) {
+  // Update UI immediately (optimistic)
+  STATE.entries[signalId] = entered;
+  const row = btn.closest('.signal-entry-row');
+  row.querySelector('.entry-btn.yes').classList.toggle('active', entered === true);
+  row.querySelector('.entry-btn.no').classList.toggle('active', entered === false);
+
+  const { error } = await sb.rpc('set_signal_entry', { p_signal_id: signalId, p_entered: entered });
+  if (error) {
+    showToast('Erro ao salvar', 'Tente novamente em alguns segundos');
+    console.error(error);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// COUNTDOWN TICKER
+// ═══════════════════════════════════════════════════
+function startCountdownTicker() {
+  if (STATE.countdownInterval) clearInterval(STATE.countdownInterval);
+  updateAllCountdowns();
+  STATE.countdownInterval = setInterval(updateAllCountdowns, 30000); // a cada 30s
+}
+
+function updateAllCountdowns() {
+  document.querySelectorAll('.signal-countdown-slot').forEach(slot => {
+    const matchDate = new Date(slot.dataset.matchDate);
+    const status = slot.dataset.status;
+    slot.innerHTML = countdownHTML(matchDate, status);
+  });
+}
+
+function countdownHTML(matchDate, status) {
+  if (status !== 'pending') return ''; // só mostra countdown em sinais pendentes
+
+  const now = new Date();
+  const diffMs = matchDate - now;
+
+  if (diffMs <= 0) {
+    return `<span class="signal-countdown started"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Já começou</span>`;
+  }
+
+  const totalMin = Math.floor(diffMs / 60000);
+  const days = Math.floor(totalMin / 1440);
+  const hours = Math.floor((totalMin % 1440) / 60);
+  const mins = totalMin % 60;
+
+  let label;
+  if (days > 0) {
+    label = `${days}d ${hours}h`;
+  } else if (hours > 0) {
+    label = `${hours}h${mins > 0 ? mins + 'min' : ''}`;
+  } else {
+    label = `${mins}min`;
+  }
+
+  const isUrgent = totalMin <= 60; // menos de 1h = urgente
+  return `<span class="signal-countdown ${isUrgent ? 'urgent' : ''}"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Começa em ${label}</span>`;
+}
+
+// ═══════════════════════════════════════════════════
+// LIKES
+// ═══════════════════════════════════════════════════
+async function toggleLike(signalId, btn) {
+  const liked = btn.classList.contains('liked');
+  const countSpan = btn.querySelector('.like-count');
+  let count = STATE.likesCount[signalId] || 0;
+
+  if (liked) {
+    // Remove like (optimistic)
+    btn.classList.remove('liked');
+    count = Math.max(0, count - 1);
+    STATE.likesCount[signalId] = count;
+    delete STATE.myLikes[signalId];
+    countSpan.textContent = count > 0 ? count : '';
+
+    const { error } = await sb.from('signal_likes').delete().eq('signal_id', signalId).eq('user_id', STATE.profile.id);
+    if (error) { btn.classList.add('liked'); showToast('Erro', 'Não foi possível descurtir'); }
+  } else {
+    // Add like (optimistic)
+    btn.classList.add('liked');
+    count = count + 1;
+    STATE.likesCount[signalId] = count;
+    STATE.myLikes[signalId] = true;
+    countSpan.textContent = count;
+
+    const { error } = await sb.from('signal_likes').insert({ signal_id: signalId, user_id: STATE.profile.id });
+    if (error) { btn.classList.remove('liked'); showToast('Erro', 'Não foi possível curtir'); }
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// COMMENTS
+// ═══════════════════════════════════════════════════
+const loadedComments = new Set();
+
+async function toggleComments(signalId, btn) {
+  const section = document.getElementById(`comments-${signalId}`);
+  const isOpen = section.classList.toggle('open');
+
+  if (isOpen && !loadedComments.has(signalId)) {
+    await loadComments(signalId);
+    loadedComments.add(signalId);
+  }
+
+  if (isOpen) {
+    setTimeout(() => document.getElementById(`comment-input-${signalId}`)?.focus(), 100);
+  }
+}
+
+async function loadComments(signalId) {
+  const list = document.getElementById(`comments-list-${signalId}`);
+  list.innerHTML = '<div class="comments-loading">Carregando comentários…</div>';
+
+  const { data, error } = await sb.from('signal_comments')
+    .select('*, profiles(full_name, email, avatar_url, is_admin)')
+    .eq('signal_id', signalId)
+    .order('created_at', { ascending: true });
+
+  if (error || !data?.length) {
+    list.innerHTML = '<div class="comments-empty">Seja o primeiro a comentar.</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(c => commentHTML(c)).join('');
+}
+
+function commentHTML(c) {
+  const name = c.profiles?.full_name || c.profiles?.email?.split('@')[0] || 'Membro';
+  const initials = name[0]?.toUpperCase() || '?';
+  const isMine = c.user_id === STATE.profile.id;
+  const canDelete = isMine || STATE.profile.is_admin;
+  const avatarContent = c.profiles?.avatar_url
+    ? `<img src="${c.profiles.avatar_url}" alt="">`
+    : initials;
+
+  return `
+    <div class="comment-item" id="comment-${c.id}">
+      <div class="comment-avatar">${avatarContent}</div>
+      <div class="comment-body">
+        <div class="comment-head">
+          <span class="comment-author">${name}</span>
+          <span class="comment-time">${fmtDatetime(c.created_at)}</span>
+          ${canDelete ? `<button class="comment-delete" onclick="deleteComment('${c.id}', '${c.signal_id}')">Excluir</button>` : ''}
+        </div>
+        <div class="comment-text">${escapeHTML(c.content)}</div>
+      </div>
+    </div>`;
+}
+
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+async function submitComment(signalId) {
+  const input = document.getElementById(`comment-input-${signalId}`);
+  const content = input.value.trim();
+  if (!content) return;
+
+  input.disabled = true;
+  const { error } = await sb.from('signal_comments').insert({
+    signal_id: signalId,
+    user_id: STATE.profile.id,
+    content,
+  });
+  input.disabled = false;
+
+  if (error) {
+    showToast('Erro ao comentar', 'Tente novamente');
+    return;
+  }
+
+  input.value = '';
+  STATE.commentsCount[signalId] = (STATE.commentsCount[signalId] || 0) + 1;
+
+  // Update the comment count label on the button
+  const card = input.closest('.signal-card');
+  const label = card.querySelector('.comment-count-label');
+  const count = STATE.commentsCount[signalId];
+  label.textContent = `${count} comentário${count > 1 ? 's' : ''}`;
+
+  await loadComments(signalId);
+}
+
+async function deleteComment(commentId, signalId) {
+  if (!confirm('Excluir este comentário?')) return;
+
+  const { error } = await sb.from('signal_comments').delete().eq('id', commentId);
+  if (error) {
+    showToast('Erro', 'Não foi possível excluir');
+    return;
+  }
+
+  document.getElementById(`comment-${commentId}`)?.remove();
+  STATE.commentsCount[signalId] = Math.max(0, (STATE.commentsCount[signalId] || 1) - 1);
+
+  const count = STATE.commentsCount[signalId];
+  document.querySelectorAll(`[onclick*="toggleComments('${signalId}'"]`).forEach(btn => {
+    const label = btn.querySelector('.comment-count-label');
+    if (label) label.textContent = count > 0 ? `${count} comentário${count > 1 ? 's' : ''}` : 'Comentar';
+  });
+
+  const list = document.getElementById(`comments-list-${signalId}`);
+  if (!list.querySelector('.comment-item')) {
+    list.innerHTML = '<div class="comments-empty">Seja o primeiro a comentar.</div>';
+  }
+}
+
+function populateAnalystFilter(signals) {
+  const sel = document.getElementById('feed-analyst-filter');
+  const seen = new Map();
+  signals.forEach(s => {
+    if (s.analysts?.handle) seen.set(s.analysts.handle, s.analysts.name);
+  });
+  sel.innerHTML = '<option value="">Todos os analistas</option>' +
+    Array.from(seen.entries()).map(([handle, name]) => `<option value="${handle}">${name}</option>`).join('');
+}
+
+function showLocked(leagueId) {
+  const league = STATE.leagues.find(l => l.id === leagueId);
+  const plan = STATE.profile.plan;
+  const sportLabels = { football:'Futebol', basketball:'Basquete', baseball:'Beisebol', tennis:'Tênis', esports:'E-Sports' };
+
+  let planNeeded, reason;
+  if (league.category === 'tennis') {
+    planNeeded = 'vip';
+    reason = `Tênis é exclusivo do plano VIP.`;
+  } else if (plan === 'starter') {
+    planNeeded = 'pro';
+    reason = `Seu plano Starter está configurado para outros esportes. Faça upgrade para Pro e escolha até 4 esportes, ou vá em "Minha Conta" para trocar sua escolha atual.`;
+  } else if (plan === 'pro') {
+    planNeeded = 'vip';
+    reason = `Esse esporte não está na sua seleção atual do Pro. Você pode trocar em "Minha Conta", ou fazer upgrade para VIP e ter tudo.`;
+  } else {
+    planNeeded = 'pro';
+    reason = `Esse canal não está incluído no seu plano atual.`;
+  }
+
+  const labels = { starter:'Starter (R$39,90/mês)', pro:'Pro (R$69,90/mês)', vip:'VIP (R$109,90/mês)' };
+  document.getElementById('lock-title').textContent = `${league?.name || 'Liga'} — Bloqueado`;
+  document.getElementById('lock-body').textContent = `${reason} Faça upgrade para o plano ${labels[planNeeded]} para desbloquear.`;
+  showView('locked');
+}
+
+function renderSkeletons() {
+  let html = '<div class="skeleton-feed">';
+  for (let i = 0; i < 3; i++) {
+    html += `<div class="skeleton-card">
+      <div class="skel-line w40"></div>
+      <div class="skel-line w80"></div>
+      <div class="skel-line w60"></div>
+    </div>`;
+  }
+  html += '</div>';
+  document.getElementById('feed-content').innerHTML = html;
+}
+
+function filterFeed(status, btn) {
+  STATE.feedFilter = status;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  applyFeedFilters();
+}
+
+function applyFeedFilters() {
+  const status = STATE.feedFilter || 'all';
+  const searchTerm = (document.getElementById('feed-search').value || '').trim().toLowerCase();
+  const analystHandle = document.getElementById('feed-analyst-filter').value;
+
+  let filtered = STATE.signals;
+
+  if (status !== 'all') {
+    filtered = filtered.filter(s => s.status === status);
+  }
+  if (searchTerm) {
+    filtered = filtered.filter(s => s.match_name.toLowerCase().includes(searchTerm));
+  }
+  if (analystHandle) {
+    filtered = filtered.filter(s => s.analysts?.handle === analystHandle);
+  }
+
+  renderFeed(filtered);
+}
+
+function renderFeed(signals) {
+  const container = document.getElementById('feed-content');
+  if (!signals.length) {
+    const hasAnySignal = STATE.signals.length > 0;
+    container.innerHTML = hasAnySignal ? `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <h3>Nada encontrado</h3>
+        <p>Tente ajustar a busca ou os filtros aplicados.</p>
+      </div>` : `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <h3>Nenhum sinal ainda</h3>
+        <p>Os analistas ainda não publicaram sinais nesta liga.</p>
+      </div>`;
+    return;
+  }
+  container.innerHTML = signals.map((s,i) => signalCardHTML(s, i)).join('');
+  updateAllCountdowns();
+}
+
+function signalCardHTML(s, idx) {
+  const league = STATE.leagues.find(l => l.id === s.league_id);
+  const isVipEarly = s.vip_early_access_until && new Date(s.vip_early_access_until) > new Date();
+  const statusMap = { pending:'Pendente', green:'✅ Green', red:'❌ Red', void:'⚪ Void' };
+  const analystName = s.analysts?.name || 'Analista';
+  const initials = analystName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  const entryState = STATE.entries[s.id]; // true, false, or undefined
+  const liked = !!STATE.myLikes[s.id];
+  const likeCount = STATE.likesCount[s.id] || 0;
+  const commentCount = STATE.commentsCount[s.id] || 0;
+
+  return `
+  <div class="signal-card fade-in" style="animation-delay:${idx * .06}s">
+    <div class="signal-card-top">
+      ${league?.logo_url
+        ? `<img class="signal-league-logo" src="${league.logo_url}" alt="${league.name}" onerror="this.style.display='none'">`
+        : ''}
+      <span class="signal-league-name">${league?.name || s.league_id}</span>
+      ${isVipEarly ? '<span class="signal-vip-tag">VIP EARLY</span>' : ''}
+      <span class="signal-countdown-slot" data-match-date="${s.match_date}" data-status="${s.status}"></span>
+      <span class="signal-time">${fmtDatetime(s.published_at)}</span>
+    </div>
+    ${s.image_url ? `
+    <div class="signal-image-wrap" onclick="openLightbox('${s.image_url}')">
+      <div class="signal-image-bg" style="background-image:url('${s.image_url}')"></div>
+      <img class="signal-image" src="${s.image_url}" alt="Imagem do sinal" loading="lazy">
+    </div>` : ''}
+    <div class="signal-card-body">
+      <div class="signal-match">${s.match_name}</div>
+      <div class="signal-metrics">
+        <div class="metric">
+          <span class="metric-label">Odd</span>
+          <span class="metric-value green">${Number(s.odd).toFixed(2)}</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Stake</span>
+          <span class="metric-value">${s.stake}u</span>
+        </div>
+        ${s.status !== 'pending' ? `
+        <div class="metric">
+          <span class="metric-label">Lucro</span>
+          <span class="metric-value ${Number(s.profit_units) >= 0 ? 'green' : ''}">${Number(s.profit_units) >= 0 ? '+' : ''}${Number(s.profit_units).toFixed(2)}u</span>
+        </div>` : ''}
+      </div>
+      <div class="signal-market">${s.market}</div>
+      ${s.analysis ? `
+        <button class="toggle-analysis" onclick="toggleAnalysis(this)">Ver análise ↓</button>
+        <div class="signal-analysis">${s.analysis}</div>
+      ` : ''}
+      <div class="signal-footer">
+        <div class="analyst-avatar-sm">${initials}</div>
+        <span class="analyst-name-sm">@${s.analysts?.handle || 'analista'}</span>
+        <span class="signal-status ${s.status}">${statusMap[s.status] || s.status}</span>
+      </div>
+    </div>
+    <div class="signal-entry-row">
+      <span class="signal-entry-label">Você entrou nessa?</span>
+      <button class="entry-btn yes ${entryState === true ? 'active' : ''}" onclick="setEntry('${s.id}', true, this)">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Entrei
+      </button>
+      <button class="entry-btn no ${entryState === false ? 'active' : ''}" onclick="setEntry('${s.id}', false, this)">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Não entrei
+      </button>
+    </div>
+    <div class="signal-social-bar">
+      <button class="social-btn ${liked ? 'liked' : ''}" onclick="toggleLike('${s.id}', this)">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="like-count">${likeCount > 0 ? likeCount : ''}</span>
+      </button>
+      <button class="social-btn" onclick="toggleComments('${s.id}', this)">
+        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <span class="comment-count-label">${commentCount > 0 ? commentCount + ' comentário' + (commentCount > 1 ? 's' : '') : 'Comentar'}</span>
+      </button>
+    </div>
+    <div class="signal-comments-section" id="comments-${s.id}">
+      <div class="comment-input-row">
+        <input type="text" placeholder="Escreva um comentário…" id="comment-input-${s.id}" onkeydown="if(event.key==='Enter')submitComment('${s.id}')">
+        <button class="comment-send-btn" onclick="submitComment('${s.id}')">Enviar</button>
+      </div>
+      <div class="comments-list" id="comments-list-${s.id}"></div>
+    </div>
+  </div>`;
+}
+
+function toggleAnalysis(btn) {
+  const analysis = btn.nextElementSibling;
+  const isOpen = analysis.classList.toggle('open');
+  btn.textContent = isOpen ? 'Fechar análise ↑' : 'Ver análise ↓';
+}
+
+// ═══════════════════════════════════════════════════
+// LIGHTBOX
+// ═══════════════════════════════════════════════════
+function openLightbox(url) {
+  document.getElementById('lightbox-img').src = url;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightbox();
+});
+
+// ═══════════════════════════════════════════════════
+// ROI
+// ═══════════════════════════════════════════════════
+async function loadROI() {
+  // Busca apenas os sinais que o membro marcou como "entrei", com resultado já definido
+  const { data: myEntries } = await sb.from('member_roi')
+    .select('*, signals(*, leagues(name, logo_url))')
+    .eq('user_id', STATE.profile.id)
+    .eq('entered', true)
+    .order('created_at', { ascending: false });
+
+  const resolved = (myEntries || []).filter(e => e.signals && ['green','red','void'].includes(e.signals.status));
+
+  const total = resolved.length;
+  const greens = resolved.filter(e => e.signals.status === 'green').length;
+  const totalUnits = resolved.reduce((acc, e) => acc + Number(e.profit_units || 0), 0);
+  const decided = resolved.filter(e => e.signals.status !== 'void').length;
+  const winRate = decided ? ((greens / decided) * 100).toFixed(1) : 0;
+
+  document.getElementById('roi-stats').innerHTML = `
+    <div class="roi-stat">
+      <div class="roi-stat-label">Minhas Unidades</div>
+      <div class="roi-stat-value ${totalUnits >= 0 ? 'pos' : 'neg'}">${totalUnits >= 0 ? '+' : ''}${totalUnits.toFixed(2)}u</div>
+    </div>
+    <div class="roi-stat">
+      <div class="roi-stat-label">Taxa de Acerto</div>
+      <div class="roi-stat-value pos">${winRate}%</div>
+    </div>
+    <div class="roi-stat">
+      <div class="roi-stat-label">Entradas</div>
+      <div class="roi-stat-value">${total}</div>
+    </div>
+    <div class="roi-stat">
+      <div class="roi-stat-label">Greens</div>
+      <div class="roi-stat-value pos">${greens}</div>
+    </div>`;
+
+  const histHtml = resolved.slice(0, 30).map(e => {
+    const s = e.signals;
+    return `
+    <div class="signal-card" style="margin-bottom:10px">
+      <div class="signal-card-body" style="padding:14px 16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          ${s.leagues?.logo_url ? `<img style="width:18px;height:18px;object-fit:contain" src="${s.leagues.logo_url}" alt="">` : ''}
+          <span style="font-size:14px;font-weight:600;flex:1">${s.match_name}</span>
+          <span class="signal-status ${s.status}">${{green:'✅ Green',red:'❌ Red',void:'⚪ Void'}[s.status]}</span>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-2)">${s.market} · Odd ${Number(s.odd).toFixed(2)} · ${s.stake}u · ${Number(e.profit_units) >= 0 ? '+' : ''}${Number(e.profit_units).toFixed(2)}u</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('roi-history').innerHTML = histHtml || `
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <h3>Nenhuma entrada registrada</h3>
+      <p>Marque "Entrei" nos sinais que você apostou para acompanhar seu ROI real aqui.</p>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// VIP CHAT
+// ═══════════════════════════════════════════════════
+let vipChatLoaded = false;
+let vipChatSubscription = null;
+
+async function loadVipChat() {
+  const container = document.getElementById('vipchat-messages');
+  container.innerHTML = '<div class="comments-loading" style="padding:40px 0">Carregando mensagens…</div>';
+
+  const { data, error } = await sb.from('vip_chat_messages')
+    .select('*, profiles(full_name, email, avatar_url, is_admin)')
+    .order('created_at', { ascending: true })
+    .limit(100);
+
+  if (error) {
+    container.innerHTML = '<div class="comments-empty">Não foi possível carregar o chat.</div>';
+    return;
+  }
+
+  if (!data?.length) {
+    container.innerHTML = `
+      <div class="empty-state" style="margin:auto">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <h3>Nenhuma mensagem ainda</h3>
+        <p>Seja o primeiro a iniciar a conversa no canal VIP.</p>
+      </div>`;
+  } else {
+    container.innerHTML = data.map(m => vipChatMessageHTML(m)).join('');
+    container.scrollTop = container.scrollHeight;
+  }
+
+  if (!vipChatLoaded) {
+    vipChatLoaded = true;
+    vipChatSubscription = sb.channel('vip_chat')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'vip_chat_messages' }, async (payload) => {
+        // Busca o profile de quem enviou pra exibir nome/avatar corretamente
+        const { data: prof } = await sb.from('profiles').select('full_name, email, avatar_url, is_admin').eq('id', payload.new.user_id).single();
+        const msg = { ...payload.new, profiles: prof };
+        const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 80;
+        if (container.querySelector('.empty-state')) container.innerHTML = '';
+        container.insertAdjacentHTML('beforeend', vipChatMessageHTML(msg));
+        if (isAtBottom || msg.user_id === STATE.profile.id) {
+          container.scrollTop = container.scrollHeight;
+        }
+      })
+      .subscribe();
+  }
+}
+
+function vipChatMessageHTML(m) {
+  const isMine = m.user_id === STATE.profile.id;
+  const name = m.profiles?.full_name || m.profiles?.email?.split('@')[0] || 'Membro';
+  const isAdmin = m.profiles?.is_admin;
+  const initials = name[0]?.toUpperCase() || '?';
+  const avatarContent = m.profiles?.avatar_url
+    ? `<img src="${m.profiles.avatar_url}" alt="">`
+    : initials;
+
+  return `
+    <div class="vipchat-msg ${isMine ? 'mine' : ''}">
+      <div class="vipchat-msg-avatar">${avatarContent}</div>
+      <div class="vipchat-msg-body">
+        <div class="vipchat-msg-head">
+          <span class="vipchat-msg-author ${isAdmin ? 'admin-author' : ''}">${isAdmin ? '⚡ ' : ''}${name}</span>
+          <span class="vipchat-msg-time">${fmtDatetime(m.created_at)}</span>
+        </div>
+        <div class="vipchat-msg-bubble">${escapeHTML(m.content)}</div>
+      </div>
+    </div>`;
+}
+
+async function sendVipChatMessage() {
+  const input = document.getElementById('vipchat-input');
+  const content = input.value.trim();
+  if (!content) return;
+
+  input.disabled = true;
+  const { error } = await sb.from('vip_chat_messages').insert({
+    user_id: STATE.profile.id,
+    content,
+  });
+  input.disabled = false;
+  input.value = '';
+  input.focus();
+
+  if (error) {
+    showToast('Erro ao enviar', 'Tente novamente');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════
+async function loadNotifications() {
+  const { data } = await sb.from('notifications')
+    .select('*')
+    .or(`user_id.eq.${STATE.profile.id},user_id.is.null`)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  const notifs = data || [];
+  const unread = notifs.filter(n => !n.read);
+  if (unread.length) {
+    document.getElementById('notif-dot').style.display = '';
+  }
+
+  const list = document.getElementById('notif-list');
+  list.innerHTML = notifs.length
+    ? notifs.map(n => `
+        <div class="notif-item${n.read ? '' : ' unread'}" onclick="markRead('${n.id}', this)">
+          <div class="notif-item-title">${n.title}</div>
+          ${n.body ? `<div class="notif-item-body">${n.body}</div>` : ''}
+          <div class="notif-item-time">${fmtDatetime(n.created_at)}</div>
+        </div>`).join('')
+    : '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">Nenhuma notificação</div>';
+}
+
+async function markRead(id, el) {
+  await sb.from('notifications').update({ read: true }).eq('id', id);
+  el.classList.remove('unread');
+}
+
+function toggleNotif() {
+  STATE.notifOpen = !STATE.notifOpen;
+  document.getElementById('notif-panel').classList.toggle('open', STATE.notifOpen);
+}
+
+// ═══════════════════════════════════════════════════
+// REALTIME — new signal toast
+// ═══════════════════════════════════════════════════
+function handleNewSignal(signal) {
+  const league = STATE.leagues.find(l => l.id === signal.league_id);
+  if (!league || !hasAccess(league)) return;
+  showToast('Novo sinal publicado', `${league.name} · ${signal.match_name}`);
+
+  // Refresh feed if watching this league
+  if (STATE.currentLeagueId === signal.league_id) {
+    STATE.signals.unshift(signal);
+    renderFeed(STATE.signals);
+  }
+}
+
+function showToast(title, sub) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<div class="toast-icon"></div><div><div class="toast-text">${title}</div><div class="toast-sub">${sub}</div></div>`;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 400);
+  }, 4000);
+}
+
+// ═══════════════════════════════════════════════════
+// VIEW TRANSITIONS
+// ═══════════════════════════════════════════════════
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`view-${name}`).classList.add('active');
+
+  // Sidebar nav
+  document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
+  const navMap = { home:'nav-home', roi:'nav-roi', vipchat:'nav-vipchat' };
+  if (navMap[name]) {
+    const el = document.getElementById(navMap[name]);
+    if (el) el.classList.add('active');
+  }
+
+  if (name === 'roi') loadROI();
+  if (name === 'vipchat') loadVipChat();
+
+  // Close notif panel
+  STATE.notifOpen = false;
+  document.getElementById('notif-panel').classList.remove('open');
+}
+
+function toggleSidebar(force) {
+  const sidebar = document.getElementById('sidebar');
+  STATE.sidebarOpen = force !== undefined ? force : !STATE.sidebarOpen;
+  sidebar.classList.toggle('open', STATE.sidebarOpen);
+}
+
+// Close panels on outside click
+document.addEventListener('click', e => {
+  if (STATE.notifOpen && !e.target.closest('#notif-panel') && !e.target.closest('#notif-btn')) {
+    STATE.notifOpen = false;
+    document.getElementById('notif-panel').classList.remove('open');
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
