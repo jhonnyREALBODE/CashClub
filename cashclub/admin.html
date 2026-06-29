@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — CashClub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green:   #1AFF6B;
+  --green-d: #0FCC55;
+  --green-x: rgba(26,255,107,.08);
+  --bg:      #04080A;
+  --surf:    #0C1410;
+  --card:    #0E1712;
+  --border:  #182218;
+  --border-h:#243824;
+  --text:    #E8F0E9;
+  --text-2:  #9BB09E;
+  --text-3:  #5A7060;
+  --sidebar-w: 220px;
+  --top-h:     56px;
+  --ff-h:  'Bricolage Grotesque', sans-serif;
+  --ff-b:  'Inter', sans-serif;
+}
+html,body { height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:var(--ff-b); font-size:14px; }
+
+/* TOPBAR */
+.topbar {
+  height:var(--top-h); background:var(--surf); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 20px; gap:16px; position:relative; z-index:50;
+}
+.logo { display:flex; align-items:center; gap:8px; }
+.logo-mark { width:28px; height:28px; background:var(--green); border-radius:6px; display:grid; place-items:center; }
+.logo-mark svg { width:16px; height:16px; fill:#04080A; }
+.logo-name { font-family:var(--ff-h); font-size:17px; font-weight:800; color:var(--text); letter-spacing:-.4px; }
+.admin-badge { margin-left:8px; padding:2px 8px; background:rgba(26,255,107,.12); border:1px solid rgba(26,255,107,.25); border-radius:4px; font-size:11px; font-weight:700; letter-spacing:.5px; color:var(--green); }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+.topbar-right span { font-size:13px; color:var(--text-2); }
+.btn-sm {
+  padding:6px 12px; border-radius:6px; border:1px solid var(--border); background:var(--card);
+  color:var(--text-2); font-family:var(--ff-b); font-size:12px; font-weight:500; cursor:pointer;
+  transition:all .2s;
+}
+.btn-sm:hover { border-color:var(--border-h); color:var(--text); }
+
+/* LAYOUT */
+.layout { display:flex; height:calc(100vh - var(--top-h)); overflow:hidden; }
+
+/* SIDEBAR */
+.sidebar {
+  width:var(--sidebar-w); background:var(--surf); border-right:1px solid var(--border);
+  flex-shrink:0; padding:16px 10px 80px; overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar { width:3px; }
+.sidebar::-webkit-scrollbar-thumb { background:var(--border-h); border-radius:3px; }
+
+.nav-section-label { font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--text-3); padding:0 8px; margin:16px 0 5px; }
+.nav-item {
+  display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:8px; cursor:pointer;
+  color:var(--text-2); font-size:13px; font-weight:500; transition:all .15s; text-decoration:none;
+}
+.nav-item:hover { background:var(--green-x); color:var(--text); }
+.nav-item.active { background:rgba(26,255,107,.1); color:var(--text); }
+.nav-item.active::before { content:''; position:absolute; left:10px; top:auto; width:2px; height:22px; background:var(--green); border-radius:0 2px 2px 0; }
+.nav-item { position:relative; }
+.nav-item svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.7; flex-shrink:0; }
+
+/* CONTENT */
+.main { flex:1; overflow-y:auto; overflow-x:hidden; }
+.main::-webkit-scrollbar { width:4px; }
+.main::-webkit-scrollbar-thumb { background:var(--border-h); border-radius:4px; }
+
+.page { padding:28px 32px; display:none; animation:fadeIn .3s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+.page-header { margin-bottom:24px; }
+.page-title { font-family:var(--ff-h); font-size:24px; font-weight:700; }
+.page-sub { color:var(--text-2); font-size:14px; margin-top:2px; }
+
+/* STAT GRID */
+.stat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:28px; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+.stat-label { font-size:11px; font-weight:600; letter-spacing:.7px; text-transform:uppercase; color:var(--text-3); margin-bottom:8px; }
+.stat-value { font-family:var(--ff-h); font-size:28px; font-weight:700; line-height:1; }
+.stat-value.green { color:var(--green); }
+.stat-sub { font-size:12px; color:var(--text-2); margin-top:4px; }
+
+/* FORM */
+.form-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; max-width:680px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.form-grid.full { grid-template-columns:1fr; }
+.field { display:flex; flex-direction:column; gap:6px; }
+.field.span2 { grid-column:1/-1; }
+.field label { font-size:12px; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:.5px; }
+.field input, .field select, .field textarea {
+  padding:10px 12px; background:var(--bg); border:1px solid var(--border); border-radius:8px;
+  color:var(--text); font-family:var(--ff-b); font-size:14px; outline:none;
+  transition:border-color .2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color:var(--green); }
+.field input::placeholder, .field textarea::placeholder { color:var(--text-3); }
+.field select option { background:var(--card); }
+.field textarea { resize:vertical; min-height:90px; }
+
+/* VIP EXCLUSIVE CHECKBOX */
+.vip-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(26,255,107,.05);
+  border: 1px solid rgba(26,255,107,.18);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.vip-checkbox-label input[type="checkbox"] {
+  width: 17px; height: 17px;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+.vip-checkbox-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 8px;
+  padding-left: 4px;
+}
+
+/* UPLOAD ZONE */
+.upload-zone{
+  position:relative;
+  border:1.5px dashed var(--border);
+  border-radius:10px;
+  min-height:140px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;background:var(--bg);
+  transition:border-color .2s,background .2s;
+  overflow:hidden;
+}
+.upload-zone:hover{border-color:var(--green);background:rgba(26,255,107,.03)}
+.upload-placeholder{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:var(--text-3);padding:24px;
+}
+.upload-placeholder svg{width:28px;height:28px;stroke:var(--text-3);fill:none;stroke-width:1.6}
+.upload-placeholder span{font-size:13px;font-weight:500;color:var(--text-2)}
+.upload-hint{font-size:11px !important;color:var(--text-3) !important;font-weight:400 !important}
+#upload-preview{
+  width:100%;max-height:280px;object-fit:contain;display:block;
+}
+#upload-remove{
+  position:absolute;top:8px;right:8px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(0,0,0,.6);border:1px solid var(--border);
+  color:var(--text);font-size:14px;cursor:pointer;
+  display:grid;place-items:center;
+  transition:background .2s;
+}
+#upload-remove:hover{background:rgba(255,60,60,.4)}
+.upload-zone.uploading{pointer-events:none;opacity:.6}
+.btn-primary {
+  padding:11px 22px; background:var(--green); border:none; border-radius:8px;
+  color:#04080A; font-family:var(--ff-b); font-size:14px; font-weight:700;
+  cursor:pointer; transition:background .2s; margin-top:8px;
+}
+.btn-primary:hover { background:var(--green-d); }
+.btn-primary.loading { opacity:.7; pointer-events:none; }
+
+/* TABLE */
+.table-wrap { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.table-toolbar {
+  display:flex; align-items:center; gap:10px; padding:14px 16px;
+  border-bottom:1px solid var(--border);
+}
+.table-toolbar h3 { font-size:15px; font-weight:600; flex:1; }
+.search-input {
+  padding:7px 12px; background:var(--bg); border:1px solid var(--border); border-radius:6px;
+  color:var(--text); font-family:var(--ff-b); font-size:13px; outline:none; width:200px;
+  transition:border-color .2s;
+}
+.search-input:focus { border-color:var(--green); }
+table { width:100%; border-collapse:collapse; }
+thead th { padding:10px 14px; text-align:left; font-size:11px; font-weight:600; letter-spacing:.7px; text-transform:uppercase; color:var(--text-3); border-bottom:1px solid var(--border); }
+tbody tr { border-bottom:1px solid var(--border); transition:background .15s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:var(--green-x); }
+tbody td { padding:11px 14px; font-size:13px; }
+
+.badge { display:inline-flex; align-items:center; padding:3px 8px; border-radius:5px; font-size:11px; font-weight:700; letter-spacing:.3px; }
+.badge.green  { background:rgba(26,255,107,.12); color:var(--green); border:1px solid rgba(26,255,107,.2); }
+.badge.red    { background:rgba(255,60,60,.1); color:#FF6B6B; border:1px solid rgba(255,60,60,.2); }
+.badge.void   { background:rgba(255,180,0,.1); color:#FFBB33; border:1px solid rgba(255,180,0,.2); }
+.badge.pending{ background:rgba(150,150,150,.1); color:var(--text-2); border:1px solid var(--border); }
+.badge.starter{ background:rgba(100,150,255,.1); color:#7FA3FF; border:1px solid rgba(100,150,255,.2); }
+.badge.pro    { background:rgba(255,170,0,.1); color:#FFAA00; border:1px solid rgba(255,170,0,.2); }
+.badge.vip    { background:rgba(26,255,107,.1); color:var(--green); border:1px solid rgba(26,255,107,.2); }
+
+.action-btn { padding:4px 9px; border-radius:5px; font-size:11px; font-weight:600; cursor:pointer; border:none; font-family:var(--ff-b); transition:all .15s; }
+.action-btn.mark-green { background:rgba(26,255,107,.12); color:var(--green); }
+.action-btn.mark-green:hover { background:rgba(26,255,107,.25); }
+.action-btn.mark-red { background:rgba(255,60,60,.1); color:#FF6B6B; }
+.action-btn.mark-red:hover { background:rgba(255,60,60,.2); }
+.action-btn.mark-void { background:rgba(255,180,0,.1); color:#FFBB33; }
+.action-btn.del { background:rgba(255,60,60,.08); color:var(--text-3); margin-left:3px; }
+.action-btn.del:hover { color:#FF6B6B; }
+
+/* ALERT */
+.alert { padding:12px 14px; border-radius:8px; font-size:13px; font-weight:500; margin-bottom:14px; display:none; }
+.alert.show { display:block; }
+.alert.success { background:rgba(26,255,107,.1); border:1px solid rgba(26,255,107,.2); color:var(--green); }
+.alert.error   { background:rgba(255,60,60,.1); border:1px solid rgba(255,60,60,.2); color:#FF6B6B; }
+
+/* REPORT */
+.report-output {
+  background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:16px;
+  font-size:13px; color:var(--text-2); white-space:pre-wrap; line-height:1.7;
+  min-height:200px; max-width:680px; font-family:'Courier New', monospace;
+}
+.btn-copy {
+  padding:9px 16px; background:var(--surf); border:1px solid var(--border); border-radius:7px;
+  color:var(--text); font-family:var(--ff-b); font-size:13px; font-weight:500; cursor:pointer;
+  margin-top:12px; transition:all .2s;
+}
+.btn-copy:hover { border-color:var(--green); color:var(--green); }
+
+/* Export btn */
+.btn-export { 
+  padding:7px 14px; background:var(--surf); border:1px solid var(--border); border-radius:7px;
+  color:var(--text-2); font-size:12px; font-weight:500; cursor:pointer; font-family:var(--ff-b);
+  transition:all .2s;
+}
+.btn-export:hover { border-color:var(--border-h); color:var(--text); }
+
+/* Empty */
+.empty { text-align:center; padding:48px 20px; color:var(--text-3); font-size:13px; }
+.empty svg { width:40px; height:40px; stroke:var(--text-3); fill:none; stroke-width:1.3; margin-bottom:12px; display:block; margin:0 auto 12px; }
+
+/* LEAGUES MANAGEMENT */
+.leagues-mgmt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.league-mgmt-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.league-mgmt-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.league-mgmt-logo-box {
+  width: 52px; height: 52px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+.league-mgmt-logo-box img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  padding: 6px;
+}
+.league-mgmt-logo-box.empty-logo svg {
+  width: 22px; height: 22px;
+  stroke: var(--text-3);
+  fill: none;
+  stroke-width: 1.5;
+}
+.league-mgmt-info { flex: 1; min-width: 0; }
+.league-mgmt-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.league-mgmt-cat { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: .4px; margin-top: 2px; }
+.league-mgmt-upload-btn {
+  width: 100%;
+  padding: 8px;
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text-2);
+  font-family: var(--ff-b);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .2s;
+}
+.league-mgmt-upload-btn:hover { border-color: var(--green); color: var(--green); }
+.league-mgmt-upload-btn.uploading { opacity: .6; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <span class="logo-name">CashClub</span>
+  </div>
+  <span class="admin-badge">ADMIN</span>
+  <div class="topbar-right">
+    <span id="admin-email">—</span>
+    <button class="btn-sm" onclick="signOut()">Sair</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section-label">Painel</div>
+    <a class="nav-item active" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+
+    <div class="nav-section-label">Sinais</div>
+    <a class="nav-item" onclick="showPage('publish')">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Publicar sinal
+    </a>
+    <a class="nav-item" onclick="showPage('signals')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Histórico de sinais
+    </a>
+
+    <div class="nav-section-label">Membros</div>
+    <a class="nav-item" onclick="showPage('members')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Membros
+    </a>
+
+    <div class="nav-section-label">Configurações</div>
+    <a class="nav-item" onclick="showPage('leagues')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+      Logos das ligas
+    </a>
+
+    <div class="nav-section-label">Relatórios</div>
+    <a class="nav-item" onclick="showPage('report')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Relatório semanal
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub" id="dash-date">—</div>
+      </div>
+      <div class="stat-grid" id="dash-stats">
+        <div class="stat-card"><div class="stat-label">MRR</div><div class="stat-value green" id="s-mrr">—</div></div>
+        <div class="stat-card"><div class="stat-label">Membros ativos</div><div class="stat-value" id="s-members">—</div></div>
+        <div class="stat-card"><div class="stat-label">Taxa de acerto</div><div class="stat-value green" id="s-winrate">—</div></div>
+        <div class="stat-card"><div class="stat-label">Lucro (unidades)</div><div class="stat-value green" id="s-units">—</div></div>
+        <div class="stat-card"><div class="stat-label">Sinais (30d)</div><div class="stat-value" id="s-signals">—</div></div>
+        <div class="stat-card"><div class="stat-label">Sinais pendentes</div><div class="stat-value" id="s-pending">—</div></div>
+      </div>
+
+      <!-- Recent signals table -->
+      <div class="table-wrap">
+        <div class="table-toolbar"><h3>Sinais recentes</h3></div>
+        <table>
+          <thead><tr>
+            <th>Partida</th><th>Liga</th><th>Odd</th><th>Stake</th><th>Status</th><th>Data</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="recent-signals-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PUBLISH SIGNAL -->
+    <div class="page" id="page-publish">
+      <div class="page-header">
+        <div class="page-title">Publicar sinal</div>
+        <div class="page-sub">Novo tip para os membros</div>
+      </div>
+      <div class="alert" id="pub-alert"></div>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="field span2">
+            <label>Partida</label>
+            <input type="text" id="pub-match" placeholder="Arsenal vs Chelsea">
+          </div>
+          <div class="field">
+            <label>Liga</label>
+            <select id="pub-league"><option value="">Selecione…</option></select>
+          </div>
+          <div class="field">
+            <label>Analista</label>
+            <select id="pub-analyst"><option value="">Selecione…</option></select>
+          </div>
+          <div class="field span2">
+            <label>Mercado</label>
+            <input type="text" id="pub-market" placeholder="Ambas Marcam — Sim">
+          </div>
+          <div class="field">
+            <label>Odd</label>
+            <input type="number" id="pub-odd" step="0.01" min="1" placeholder="1.85">
+          </div>
+          <div class="field">
+            <label>Stake (unidades)</label>
+            <input type="number" id="pub-stake" min="1" max="10" value="2">
+          </div>
+          <div class="field">
+            <label>Data da partida</label>
+            <input type="date" id="pub-date" placeholder="2026-09-15">
+          </div>
+          <div class="field">
+            <label>Hora da partida</label>
+            <input type="time" id="pub-time" value="20:00">
+          </div>
+          <div class="field">
+            <label>Antecipação VIP (min)</label>
+            <input type="number" id="pub-vip-early" placeholder="60" min="0">
+          </div>
+          <div class="field span2">
+            <label class="vip-checkbox-label">
+              <input type="checkbox" id="pub-vip-exclusive" onchange="toggleVipExclusiveHint()">
+              <span>⚡ Entrada ao vivo — exclusivo VIP</span>
+            </label>
+            <span class="vip-checkbox-hint" id="vip-exclusive-hint" style="display:none">Esse sinal só aparece para membros VIP. Use para entradas durante o jogo, fora do fluxo normal de publicação.</span>
+          </div>
+          <div class="field span2">
+            <label>Análise (opcional)</label>
+            <textarea id="pub-analysis" placeholder="Contexto, forma recente, motivo da entrada…"></textarea>
+          </div>
+          <div class="field span2">
+            <label>Imagem do sinal (print, odd, estatística…)</label>
+            <div id="upload-zone" class="upload-zone" onclick="document.getElementById('pub-image-input').click()">
+              <input type="file" id="pub-image-input" accept="image/*" style="display:none" onchange="handleImageSelect(event)">
+              <div id="upload-placeholder" class="upload-placeholder">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Clique para enviar uma imagem</span>
+                <span class="upload-hint">Ideal: 1280×800px (16:10) · PNG ou JPG até 5MB</span>
+              </div>
+              <img id="upload-preview" style="display:none" />
+              <button type="button" id="upload-remove" onclick="removeImage(event)" style="display:none">✕</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn-publish" onclick="publishSignal()">Publicar sinal</button>
+      </div>
+    </div>
+
+    <!-- SIGNALS HISTORY -->
+    <div class="page" id="page-signals">
+      <div class="page-header">
+        <div class="page-title">Histórico de sinais</div>
+        <div class="page-sub">Marque resultados e exporte</div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3>Todos os sinais</h3>
+          <input class="search-input" placeholder="Buscar partida…" oninput="filterSignalsTable(this.value)">
+          <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Partida</th><th>Liga</th><th>Mercado</th><th>Odd</th><th>Stake</th><th>Status</th><th>Lucro</th><th>Data</th><th>Resultado</th>
+          </tr></thead>
+          <tbody id="all-signals-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MEMBERS -->
+    <div class="page" id="page-members">
+      <div class="page-header">
+        <div class="page-title">Membros</div>
+        <div class="page-sub">Gestão de assinantes</div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3>Todos os membros</h3>
+          <input class="search-input" placeholder="Buscar email…" oninput="filterMembersTable(this.value)">
+          <button class="btn-export" onclick="exportMembersCSV()">⬇ CSV</button>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Nome</th><th>Email</th><th>Plano</th><th>Esportes</th><th>Expira</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="members-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LEAGUES / LOGOS -->
+    <div class="page" id="page-leagues">
+      <div class="page-header">
+        <div class="page-title">Logos das ligas</div>
+        <div class="page-sub">Envie a imagem oficial de cada liga — aparece na sidebar e no feed dos membros</div>
+      </div>
+      <div id="leagues-grid" class="leagues-mgmt-grid"></div>
+    </div>
+
+    <!-- REPORT -->
+    <div class="page" id="page-report">
+      <div class="page-header">
+        <div class="page-title">Relatório semanal</div>
+        <div class="page-sub">Pronto para copiar no Twitter/X</div>
+      </div>
+      <div class="form-card" style="margin-bottom:16px;max-width:400px">
+        <div class="form-grid full">
+          <div class="field">
+            <label>Início da semana</label>
+            <input type="date" id="rep-start">
+          </div>
+          <div class="field">
+            <label>Fim da semana</label>
+            <input type="date" id="rep-end">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="generateReport()">Gerar relatório</button>
+      </div>
+      <pre class="report-output" id="report-output">O relatório aparecerá aqui…</pre>
+      <button class="btn-copy" onclick="copyReport()">Copiar texto</button>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let ALL_SIGNALS = [];
+let ALL_MEMBERS = [];
+let ALL_LEAGUES = [];
+let ALL_ANALYSTS = [];
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+async function init() {
+  const profile = await getCurrentProfile();
+  if (!profile) return window.location.href = '/login.html';
+  if (!profile.is_admin) return window.location.href = '/members.html';
+
+  document.getElementById('admin-email').textContent = profile.email;
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+
+  await Promise.all([loadLeagues(), loadAnalysts()]);
+  await Promise.all([loadDashboard(), loadSignals(), loadMembers()]);
+
+  // Set default dates for report (last 7 days)
+  const today = new Date();
+  const w7 = new Date(); w7.setDate(today.getDate() - 7);
+  document.getElementById('rep-end').value   = today.toISOString().slice(0,10);
+  document.getElementById('rep-start').value = w7.toISOString().slice(0,10);
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  event?.target?.closest('.nav-item')?.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════
+// LOAD LEAGUES + ANALYSTS
+// ═══════════════════════════════════════════════
+async function loadLeagues() {
+  const { data } = await sb.from('leagues').select('*').eq('active',true).order('sort_order');
+  ALL_LEAGUES = data || [];
+  const sel = document.getElementById('pub-league');
+  sel.innerHTML = '<option value="">Selecione a liga…</option>';
+  ALL_LEAGUES.forEach(l => {
+    sel.innerHTML += `<option value="${l.id}">${l.name}</option>`;
+  });
+  renderLeaguesManagement();
+}
+
+// ═══════════════════════════════════════════════
+// LEAGUES LOGO MANAGEMENT
+// ═══════════════════════════════════════════════
+const CATEGORY_LABELS_ADMIN = {
+  football: 'Futebol', basketball: 'Basquete', baseball: 'Beisebol',
+  tennis: 'Tênis', esports: 'E-Sports', nfl: 'NFL',
+};
+
+function renderLeaguesManagement() {
+  const grid = document.getElementById('leagues-grid');
+  if (!grid) return;
+  grid.innerHTML = ALL_LEAGUES.map(l => `
+    <div class="league-mgmt-card" id="league-mgmt-${l.id}">
+      <div class="league-mgmt-top">
+        <div class="league-mgmt-logo-box ${l.logo_url ? '' : 'empty-logo'}">
+          ${l.logo_url
+            ? `<img src="${l.logo_url}" alt="${l.name}" onerror="this.parentElement.classList.add('empty-logo');this.remove()">`
+            : `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>`}
+        </div>
+        <div class="league-mgmt-info">
+          <div class="league-mgmt-name">${l.name}</div>
+          <div class="league-mgmt-cat">${CATEGORY_LABELS_ADMIN[l.category] || l.category}</div>
+        </div>
+      </div>
+      <input type="file" accept="image/*" style="display:none" id="logo-input-${l.id}" onchange="handleLogoUpload('${l.id}', event)">
+      <button class="league-mgmt-upload-btn" id="logo-btn-${l.id}" onclick="document.getElementById('logo-input-${l.id}').click()">
+        ${l.logo_url ? 'Substituir logo' : 'Enviar logo'}
+      </button>
+    </div>`).join('');
+}
+
+async function handleLogoUpload(leagueId, event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Imagem muito grande. Máximo 2MB.');
+    event.target.value = '';
+    return;
+  }
+
+  const btn = document.getElementById(`logo-btn-${leagueId}`);
+  btn.classList.add('uploading');
+  btn.textContent = 'Enviando…';
+
+  try {
+    const ext = file.name.split('.').pop();
+    const fileName = `league-${leagueId}-${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await sb.storage.from('signal-images').upload(fileName, file);
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = sb.storage.from('signal-images').getPublicUrl(fileName);
+    const logoUrl = urlData.publicUrl;
+
+    const { error: updateError } = await sb.from('leagues').update({ logo_url: logoUrl }).eq('id', leagueId);
+    if (updateError) throw updateError;
+
+    // Update local state and re-render
+    const league = ALL_LEAGUES.find(l => l.id === leagueId);
+    if (league) league.logo_url = logoUrl;
+    renderLeaguesManagement();
+
+  } catch (err) {
+    alert('Erro ao enviar logo: ' + err.message);
+    btn.classList.remove('uploading');
+    btn.textContent = 'Enviar logo';
+  }
+}
+
+async function loadAnalysts() {
+  const { data } = await sb.from('analysts').select('*').eq('active',true);
+  ALL_ANALYSTS = data || [];
+  const sel = document.getElementById('pub-analyst');
+  sel.innerHTML = '<option value="">Selecione o analista…</option>';
+  ALL_ANALYSTS.forEach(a => {
+    sel.innerHTML += `<option value="${a.id}">${a.name} (@${a.handle})</option>`;
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+async function loadDashboard() {
+  // Membros ativos
+  const { count: memberCount } = await sb.from('profiles')
+    .select('id', { count: 'exact' })
+    .neq('plan','free')
+    .eq('is_admin',false);
+
+  // MRR real: diferencia mensal de trimestral usando o ID do plano no Mercado Pago,
+  // já que cada plano tem um preapproval_plan_id fixo e conhecido.
+  const MONTHLY_MRR = {
+    'd9cb5cdb84354757bbba4c026b1fe982': 39.90,  // Starter mensal
+    'd6347a6bcfc140cbb15abc4f3a2b2b58': 69.90,  // Pro mensal
+    '97609c315e794f53ac895b441c5dd167': 109.90, // VIP mensal
+    '5fe072ebb7db4119b9592c3ad70e62d7': 101.90 / 3,  // Starter trimestral → MRR equivalente
+    '960d16f1d9a34bd8be5657a6d44ab2d8': 178.90 / 3,  // Pro trimestral → MRR equivalente
+    'a469d091f5e24346bab321e0d6931569': 279.90 / 3,  // VIP trimestral → MRR equivalente
+  };
+  // Fallback por plano, para Pix ou registros sem preapproval_id identificável
+  const FALLBACK_PRICES = { starter: 39.90, pro: 69.90, vip: 109.90 };
+
+  const { data: planData } = await sb.from('profiles')
+    .select('plan, mp_preapproval_id')
+    .neq('plan','free')
+    .eq('is_admin',false);
+
+  const mrr = (planData || []).reduce((acc, p) => {
+    const byId = MONTHLY_MRR[p.mp_preapproval_id];
+    return acc + (byId !== undefined ? byId : (FALLBACK_PRICES[p.plan] || 0));
+  }, 0);
+
+  // Sinais 30 dias
+  const d30 = new Date(); d30.setDate(d30.getDate() - 30);
+  const { data: signals30 } = await sb.from('signals')
+    .select('*')
+    .gte('created_at', d30.toISOString())
+    .order('created_at', { ascending: false });
+
+  ALL_SIGNALS = signals30 || [];
+
+  const resolved = ALL_SIGNALS.filter(s => s.status !== 'pending');
+  const greens   = resolved.filter(s => s.status === 'green');
+  const winRate  = resolved.length ? ((greens.length / resolved.length) * 100).toFixed(1) : 0;
+  const units    = resolved.reduce((a,s) => a + Number(s.profit_units||0), 0);
+  const pending  = ALL_SIGNALS.filter(s => s.status === 'pending').length;
+
+  document.getElementById('s-mrr').textContent      = `R$${mrr.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+  document.getElementById('s-members').textContent  = memberCount || 0;
+  document.getElementById('s-winrate').textContent  = `${winRate}%`;
+  document.getElementById('s-units').textContent    = `${units >= 0 ? '+' : ''}${units.toFixed(2)}u`;
+  document.getElementById('s-signals').textContent  = ALL_SIGNALS.length;
+  document.getElementById('s-pending').textContent  = pending;
+
+  // Recent signals table (last 10)
+  renderRecentSignals(ALL_SIGNALS.slice(0,10));
+}
+
+function renderRecentSignals(signals) {
+  const tbody = document.getElementById('recent-signals-tbody');
+  if (!signals.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty">Nenhum sinal publicado</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = signals.map(s => {
+    const league = ALL_LEAGUES.find(l => l.id === s.league_id);
+    const hoursOverdue = s.status === 'pending' ? (Date.now() - new Date(s.match_date).getTime()) / 3600000 : 0;
+    const isOverdue = hoursOverdue > 4;
+    return `
+    <tr ${isOverdue ? 'style="background:rgba(255,170,50,.06)"' : ''}>
+      <td><strong>${s.match_name}</strong>${isOverdue ? ' <span style="color:#FFAA33;font-size:11px" title="Jogo já passou e o resultado ainda não foi marcado">⚠ aguardando resultado</span>' : ''}</td>
+      <td>${league?.name || s.league_id}</td>
+      <td>${Number(s.odd).toFixed(2)}</td>
+      <td>${s.stake}u</td>
+      <td><span class="badge ${s.status}">${{pending:'Pendente',green:'Green',red:'Red',void:'Void'}[s.status]}</span></td>
+      <td>${fmtDate(s.match_date)}</td>
+      <td>${s.status === 'pending' ? `
+        <button class="action-btn mark-green" onclick="markResult('${s.id}','green')">✅</button>
+        <button class="action-btn mark-red"   onclick="markResult('${s.id}','red')">❌</button>
+        <button class="action-btn mark-void"  onclick="markResult('${s.id}','void')">⚪</button>
+      ` : `<span style="color:var(--text-3);font-size:12px">${Number(s.profit_units||0) >= 0 ? '+' : ''}${Number(s.profit_units||0).toFixed(2)}u</span>`}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// IMAGE UPLOAD
+// ═══════════════════════════════════════════════
+let SELECTED_IMAGE_FILE = null;
+
+function handleImageSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    showAlert('pub-alert', 'Imagem muito grande. Máximo 5MB.', 'error');
+    event.target.value = '';
+    return;
+  }
+
+  SELECTED_IMAGE_FILE = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('upload-placeholder').style.display = 'none';
+    const preview = document.getElementById('upload-preview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    document.getElementById('upload-remove').style.display = 'grid';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage(event) {
+  event.stopPropagation();
+  SELECTED_IMAGE_FILE = null;
+  document.getElementById('pub-image-input').value = '';
+  document.getElementById('upload-placeholder').style.display = 'flex';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('upload-remove').style.display = 'none';
+}
+
+async function uploadSignalImage(file) {
+  const ext = file.name.split('.').pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { error } = await sb.storage.from('signal-images').upload(fileName, file);
+  if (error) throw error;
+
+  const { data } = sb.storage.from('signal-images').getPublicUrl(fileName);
+  return data.publicUrl;
+}
+
+// ═══════════════════════════════════════════════
+// PUBLISH SIGNAL
+// ═══════════════════════════════════════════════
+async function publishSignal() {
+  const match    = document.getElementById('pub-match').value.trim();
+  const leagueId = document.getElementById('pub-league').value;
+  const analystId= document.getElementById('pub-analyst').value;
+  const market   = document.getElementById('pub-market').value.trim();
+  const odd      = parseFloat(document.getElementById('pub-odd').value);
+  const stake    = parseInt(document.getElementById('pub-stake').value);
+  const dateVal  = document.getElementById('pub-date').value + 'T' + (document.getElementById('pub-time').value || '20:00');
+  const analysis = document.getElementById('pub-analysis').value.trim();
+  const earlyMin = parseInt(document.getElementById('pub-vip-early').value) || 0;
+  const vipExclusive = document.getElementById('pub-vip-exclusive').checked;
+
+  if (!match || !leagueId || !market || !odd || !stake || !dateVal) {
+    return showAlert('pub-alert','Preencha todos os campos obrigatórios.','error');
+  }
+
+  const btn = document.getElementById('btn-publish');
+  btn.classList.add('loading');
+
+  let imageUrl = null;
+  if (SELECTED_IMAGE_FILE) {
+    btn.textContent = 'Enviando imagem…';
+    document.getElementById('upload-zone').classList.add('uploading');
+    try {
+      imageUrl = await uploadSignalImage(SELECTED_IMAGE_FILE);
+    } catch (err) {
+      btn.classList.remove('loading');
+      btn.textContent = 'Publicar sinal';
+      document.getElementById('upload-zone').classList.remove('uploading');
+      return showAlert('pub-alert', 'Erro ao enviar imagem: ' + err.message, 'error');
+    }
+    document.getElementById('upload-zone').classList.remove('uploading');
+  }
+
+  btn.textContent = 'Publicando…';
+
+  let vipEarlyUntil = null;
+  if (earlyMin > 0) {
+    const matchDate = new Date(dateVal);
+    vipEarlyUntil = new Date(matchDate.getTime() - earlyMin * 60000).toISOString();
+  }
+
+  const user = await getCurrentUser();
+  const { error } = await sb.from('signals').insert({
+    match_name: match,
+    league_id:  leagueId,
+    analyst_id: analystId || null,
+    market,
+    odd,
+    stake,
+    analysis:   analysis || null,
+    image_url:  imageUrl,
+    match_date: new Date(dateVal).toISOString(),
+    vip_early_access_until: vipEarlyUntil,
+    vip_exclusive: vipExclusive,
+    created_by: user.id,
+  });
+
+  btn.classList.remove('loading');
+  btn.textContent = 'Publicar sinal';
+
+  if (error) return showAlert('pub-alert', error.message, 'error');
+
+  showAlert('pub-alert','Sinal publicado com sucesso! 🎯','success');
+
+  // Notifica apenas os membros que realmente têm acesso a essa categoria de esporte —
+  // evita avisar quem não pode ver o sinal (gera frustração e clique em "bloqueado").
+  await notifyEligibleMembers(leagueId, `Novo sinal: ${match}`, `${market} @ ${odd.toFixed(2)} · ${stake}u`, 'signal', vipExclusive);
+
+  // Gera a imagem pronta pra postar no Twitter, com os dados que acabaram de ser publicados
+  const league = ALL_LEAGUES.find(l => l.id === leagueId);
+  generateSocialImage({
+    leagueName: league?.name || leagueId,
+    leagueLogo: league?.logo_url || '',
+    match, market, odd, stake, analysis,
+  });
+
+  // Reset form
+  ['pub-match','pub-market','pub-odd','pub-analysis','pub-vip-early'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pub-league').value = '';
+  document.getElementById('pub-analyst').value = '';
+  document.getElementById('pub-stake').value = '2';
+  document.getElementById('pub-vip-exclusive').checked = false;
+  toggleVipExclusiveHint();
+  removeImage({ stopPropagation: () => {} });
+}
+
+async function notifyEligibleMembers(leagueId, title, body, type, vipOnly) {
+  const league = ALL_LEAGUES.find(l => l.id === leagueId);
+  if (!league) return;
+
+  // Sinais exclusivos VIP só notificam quem é VIP de fato
+  if (vipOnly) {
+    const { data: vipMembers } = await sb.from('profiles')
+      .select('id')
+      .eq('plan', 'vip')
+      .eq('is_admin', false);
+    if (!vipMembers?.length) return;
+    const notifs = vipMembers.map(m => ({ user_id: m.id, title, body, type }));
+    await sb.from('notifications').insert(notifs);
+    return;
+  }
+
+  if (league.category === 'tennis') {
+    // Tênis é sempre exclusivo VIP, então notifica só VIPs
+    const { data: vipMembers } = await sb.from('profiles')
+      .select('id').eq('plan', 'vip').eq('is_admin', false);
+    if (!vipMembers?.length) return;
+    await sb.from('notifications').insert(vipMembers.map(m => ({ user_id: m.id, title, body, type })));
+    return;
+  }
+
+  // Para as demais categorias: VIP sempre recebe, Pro/Starter só se escolheram essa categoria
+  const { data: members } = await sb.from('profiles')
+    .select('id, plan, pro_categories, starter_categories')
+    .eq('is_admin', false)
+    .neq('plan', 'free');
+
+  const eligible = (members || []).filter(m => {
+    if (m.plan === 'vip') return true;
+    if (m.plan === 'pro') return m.pro_categories?.includes(league.category);
+    if (m.plan === 'starter') return m.starter_categories?.includes(league.category);
+    return false;
+  });
+
+  if (!eligible.length) return;
+  await sb.from('notifications').insert(eligible.map(m => ({ user_id: m.id, title, body, type })));
+}
+
+function toggleVipExclusiveHint() {
+  const checked = document.getElementById('pub-vip-exclusive').checked;
+  document.getElementById('vip-exclusive-hint').style.display = checked ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════════════════
+// GERAÇÃO DE IMAGEM PRA POSTAR (Twitter/Instagram)
+// ═══════════════════════════════════════════════
+function generateSocialImageForSignal(signalId) {
+  const s = ALL_SIGNALS.find(sig => sig.id === signalId);
+  if (!s) return;
+  const league = ALL_LEAGUES.find(l => l.id === s.league_id);
+  generateSocialImage({
+    leagueName: league?.name || s.league_id,
+    leagueLogo: league?.logo_url || '',
+    match: s.match_name,
+    market: s.market,
+    odd: s.odd,
+    stake: s.stake,
+    analysis: s.analysis,
+  });
+}
+
+async function generateSocialImage(data) {
+  const canvas = document.createElement('canvas');
+  const W = 1200;
+  const H = data.analysis ? 760 : 675; // mais alto se tiver análise pra mostrar
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Fundo
+  ctx.fillStyle = '#04080A';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grade sutil de fundo (textura premium)
+  ctx.strokeStyle = 'rgba(26,255,107,0.04)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Glow verde no topo
+  const glow = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, 500);
+  glow.addColorStop(0, 'rgba(26,255,107,0.12)');
+  glow.addColorStop(1, 'rgba(26,255,107,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Logo da marca (canto superior esquerdo)
+  ctx.fillStyle = '#1AFF6B';
+  roundRect(ctx, 50, 50, 44, 44, 10);
+  ctx.fill();
+  ctx.fillStyle = '#04080A';
+  ctx.font = 'bold 26px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('C', 72, 74);
+
+  ctx.fillStyle = '#E8F0E9';
+  ctx.font = 'bold 28px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('CashClub', 108, 74);
+
+  // Tag da liga
+  ctx.fillStyle = 'rgba(26,255,107,0.1)';
+  ctx.strokeStyle = 'rgba(26,255,107,0.3)';
+  ctx.lineWidth = 1;
+  const leagueTagWidth = ctx.measureText(data.leagueName).width + 40;
+  roundRect(ctx, 50, 130, leagueTagWidth, 36, 18);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#1AFF6B';
+  ctx.font = '600 16px Arial';
+  ctx.fillText(data.leagueName.toUpperCase(), 70, 148);
+
+  // Nome da partida (destaque principal)
+  ctx.fillStyle = '#E8F0E9';
+  ctx.font = 'bold 52px Arial';
+  wrapText(ctx, data.match, 50, 240, 1100, 58);
+
+  // Métricas: Odd e Stake em destaque
+  const metricY = 380;
+  drawMetricBox(ctx, 50, metricY, 'ODD', Number(data.odd).toFixed(2), '#1AFF6B');
+  drawMetricBox(ctx, 280, metricY, 'STAKE', data.stake + 'u', '#E8F0E9');
+
+  // Mercado
+  ctx.fillStyle = '#9BB09E';
+  ctx.font = '500 24px Arial';
+  ctx.fillText(data.market, 50, 500);
+
+  // Análise (se houver) — caixa separada com o raciocínio resumido
+  let footerY = 600;
+  if (data.analysis) {
+    const boxY = 530;
+    const boxH = 130;
+    ctx.fillStyle = '#0E1712';
+    ctx.strokeStyle = '#182218';
+    ctx.lineWidth = 1;
+    roundRect(ctx, 50, boxY, 1100, boxH, 10);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#1AFF6B';
+    ctx.font = '700 13px Arial';
+    ctx.fillText('ANÁLISE', 70, boxY + 26);
+
+    ctx.fillStyle = '#9BB09E';
+    ctx.font = '400 20px Arial';
+    wrapTextClamped(ctx, data.analysis, 70, boxY + 58, 1060, 28, 2);
+
+    footerY = boxY + boxH + 40;
+  }
+
+  // Rodapé
+  ctx.fillStyle = '#5A7060';
+  ctx.font = '500 18px Arial';
+  ctx.fillText('Histórico completo e ROI real na plataforma', 50, footerY);
+
+  ctx.fillStyle = '#1AFF6B';
+  ctx.font = 'bold 20px Arial';
+  ctx.fillText('cashclub.joaoreche9.workers.dev', 50, footerY + 32);
+
+  // Converte pra imagem e mostra no modal
+  const dataUrl = canvas.toDataURL('image/png');
+  showImagePreviewModal(dataUrl);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '';
+  let curY = y;
+  for (let word of words) {
+    const testLine = line + word + ' ';
+    if (ctx.measureText(testLine).width > maxWidth && line !== '') {
+      ctx.fillText(line, x, curY);
+      line = word + ' ';
+      curY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, curY);
+}
+
+function wrapTextClamped(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+  const words = text.split(' ');
+  let line = '';
+  let curY = y;
+  let lineCount = 0;
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    const testLine = line + word + ' ';
+    if (ctx.measureText(testLine).width > maxWidth && line !== '') {
+      lineCount++;
+      if (lineCount === maxLines) {
+        // Última linha permitida — corta com "..." se ainda sobrar texto
+        const remaining = words.slice(i).join(' ');
+        let truncated = line.trim();
+        while (ctx.measureText(truncated + '…').width > maxWidth && truncated.length > 0) {
+          truncated = truncated.slice(0, -1);
+        }
+        ctx.fillText(truncated + (remaining ? '…' : ''), x, curY);
+        return;
+      }
+      ctx.fillText(line, x, curY);
+      line = word + ' ';
+      curY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, curY);
+}
+
+function drawMetricBox(ctx, x, y, label, value, color) {
+  ctx.fillStyle = '#0E1712';
+  ctx.strokeStyle = '#182218';
+  ctx.lineWidth = 1;
+  roundRect(ctx, x, y, 200, 90, 10);
+  ctx.fill(); ctx.stroke();
+
+  ctx.fillStyle = '#5A7060';
+  ctx.font = '600 14px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText(label, x + 18, y + 28);
+
+  ctx.fillStyle = color;
+  ctx.font = 'bold 36px Arial';
+  ctx.fillText(value, x + 18, y + 68);
+}
+
+function showImagePreviewModal(dataUrl) {
+  let modal = document.getElementById('image-preview-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'image-preview-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(4,8,10,.9);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div style="background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:680px;width:100%">
+      <h3 style="font-family:var(--ff-h);font-size:18px;font-weight:700;margin-bottom:4px">Imagem pronta pra postar</h3>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:18px">Baixa e posta direto no Twitter/Instagram</p>
+      <img src="${dataUrl}" style="width:100%;border-radius:10px;border:1px solid var(--border);margin-bottom:18px">
+      <div style="display:flex;gap:10px">
+        <a href="${dataUrl}" download="cashclub-sinal.png" style="flex:1;text-align:center;padding:12px;background:var(--green);color:#04080A;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;font-family:var(--ff-b)">⬇ Baixar imagem</a>
+        <button onclick="document.getElementById('image-preview-modal').remove()" style="padding:12px 20px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;cursor:pointer;font-family:var(--ff-b)">Fechar</button>
+      </div>
+    </div>
+  `;
+}
+
+
+// ═══════════════════════════════════════════════
+// SIGNALS HISTORY
+// ═══════════════════════════════════════════════
+async function loadSignals() {
+  const { data } = await sb.from('signals')
+    .select('*, analysts(name,handle)')
+    .order('published_at', { ascending: false });
+  ALL_SIGNALS = data || [];
+  renderSignalsTable(ALL_SIGNALS);
+}
+
+function renderSignalsTable(signals) {
+  const tbody = document.getElementById('all-signals-tbody');
+  if (!signals.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Nenhum sinal encontrado</div></td></tr>`;
+    return;
+  }
+  const statusLabels = {pending:'Pendente',green:'Green',red:'Red',void:'Void'};
+  tbody.innerHTML = signals.map(s => {
+    const league = ALL_LEAGUES.find(l => l.id === s.league_id);
+    const p = Number(s.profit_units||0);
+    return `
+    <tr>
+      <td><strong>${s.match_name}</strong>${s.vip_exclusive ? ' <span style="color:var(--green);font-size:11px">⚡VIP</span>' : ''}</td>
+      <td style="font-size:12px;color:var(--text-2)">${league?.name || s.league_id}</td>
+      <td style="font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.market}</td>
+      <td>${Number(s.odd).toFixed(2)}</td>
+      <td>${s.stake}u</td>
+      <td><span class="badge ${s.status}">${statusLabels[s.status]}</span></td>
+      <td style="color:${p >= 0 ? 'var(--green)' : '#FF6B6B'};font-weight:600">${s.status!=='pending' ? `${p>=0?'+':''}${p.toFixed(2)}u` : '—'}</td>
+      <td style="font-size:12px;color:var(--text-2)">${fmtDate(s.match_date)}</td>
+      <td>
+        ${s.status === 'pending' ? `
+          <button class="action-btn mark-green" onclick="markResult('${s.id}','green')">✅</button>
+          <button class="action-btn mark-red"   onclick="markResult('${s.id}','red')">❌</button>
+          <button class="action-btn mark-void"  onclick="markResult('${s.id}','void')">⚪</button>
+        ` : '<span style="color:var(--text-3);font-size:11px">Concluído</span>'}
+        <button class="action-btn" style="background:rgba(26,255,107,.1);color:var(--green)" onclick='generateSocialImageForSignal("${s.id}")' title="Gerar imagem pra postar">🖼</button>
+        <button class="action-btn del" onclick="deleteSignal('${s.id}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterSignalsTable(q) {
+  const filtered = ALL_SIGNALS.filter(s => s.match_name.toLowerCase().includes(q.toLowerCase()));
+  renderSignalsTable(filtered);
+}
+
+async function markResult(id, status) {
+  await sb.rpc('calculate_signal_profit', { p_signal_id: id, p_status: status });
+
+  // Notifica só quem marcou "Entrei" nesse sinal específico — resultado de um
+  // sinal que a pessoa nem apostou não é relevante pra ela.
+  const sig = ALL_SIGNALS.find(s => s.id === id);
+  if (sig) {
+    const p = status === 'green' ? (sig.odd - 1) * sig.stake : status === 'red' ? -sig.stake : 0;
+    const title = `Resultado: ${sig.match_name}`;
+    const body = `${status === 'green' ? '✅ Green' : status === 'red' ? '❌ Red' : '⚪ Void'} · ${p >= 0 ? '+' : ''}${p.toFixed(2)}u`;
+
+    const { data: entries } = await sb.from('member_roi')
+      .select('user_id')
+      .eq('signal_id', id)
+      .eq('entered', true);
+
+    if (entries?.length) {
+      await sb.from('notifications').insert(
+        entries.map(e => ({ user_id: e.user_id, title, body, type: 'result', signal_id: id }))
+      );
+    }
+  }
+  await loadSignals();
+  await loadDashboard();
+}
+
+async function deleteSignal(id) {
+  if (!confirm('Excluir este sinal?')) return;
+  await sb.from('signals').delete().eq('id', id);
+  await loadSignals();
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT CSV
+// ═══════════════════════════════════════════════
+function exportCSV() {
+  const headers = ['Partida','Liga','Mercado','Odd','Stake','Status','Lucro (u)','Data'];
+  const rows = ALL_SIGNALS.map(s => {
+    const league = ALL_LEAGUES.find(l => l.id === s.league_id);
+    return [
+      `"${s.match_name}"`,
+      league?.name || s.league_id,
+      `"${s.market}"`,
+      String(s.odd).replace('.', ','),
+      s.stake,
+      s.status,
+      String(s.profit_units || 0).replace('.', ','),
+      fmtDate(s.match_date),
+    ].join(';');
+  });
+  const csv = [headers.join(';'), ...rows].join('\n');
+  // Adiciona BOM UTF-8 para o Excel brasileiro reconhecer acentos corretamente
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `cashclub-sinais-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function exportMembersCSV() {
+  const sportNames = { football:'Futebol', basketball:'Basquete', baseball:'Beisebol', nfl:'NFL', tennis:'Tênis', esports:'E-Sports' };
+  const headers = ['Nome','Email','Plano','Esportes escolhidos','Membro desde','Plano expira','Status renovação'];
+  const rows = ALL_MEMBERS.map(m => {
+    let sports = '';
+    if (m.plan === 'starter') sports = (m.starter_categories || []).map(c => sportNames[c] || c).join(', ');
+    else if (m.plan === 'pro') sports = (m.pro_categories || []).map(c => sportNames[c] || c).join(', ');
+    else if (m.plan === 'vip') sports = 'Todos';
+
+    const renewalStatus = m.mp_subscription_status === 'cancelled_no_renew' ? 'Não renova' : (m.plan !== 'free' ? 'Renovando' : '—');
+
+    return [
+      `"${m.full_name || ''}"`,
+      m.email,
+      m.plan,
+      `"${sports}"`,
+      fmtDate(m.created_at),
+      m.plan_expires_at ? fmtDate(m.plan_expires_at) : '—',
+      renewalStatus,
+    ].join(';');
+  });
+  const csv = [headers.join(';'), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `cashclub-membros-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════
+// MEMBERS
+// ═══════════════════════════════════════════════
+async function loadMembers() {
+  const { data } = await sb.from('profiles')
+    .select('*')
+    .eq('is_admin', false)
+    .order('created_at', { ascending: false });
+  ALL_MEMBERS = data || [];
+  renderMembersTable(ALL_MEMBERS);
+}
+
+function renderMembersTable(members) {
+  const tbody = document.getElementById('members-tbody');
+  if (!members.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty">Nenhum membro ainda</div></td></tr>`;
+    return;
+  }
+  const sportIcons = { football:'⚽', basketball:'🏀', baseball:'⚾', nfl:'🏈', tennis:'🎾', esports:'🎮' };
+
+  tbody.innerHTML = members.map(m => {
+    let sportsDisplay = '<span style="color:var(--text-3);font-size:11px">—</span>';
+    if (m.plan === 'starter' && m.starter_categories?.length) {
+      sportsDisplay = m.starter_categories.map(c => sportIcons[c] || c).join(' ');
+    } else if (m.plan === 'pro' && m.pro_categories?.length) {
+      sportsDisplay = m.pro_categories.map(c => sportIcons[c] || c).join(' ');
+    } else if (m.plan === 'vip') {
+      sportsDisplay = '⚽🏀⚾🏈🎾🎮';
+    } else if (m.plan === 'starter' || m.plan === 'pro') {
+      sportsDisplay = '<span style="color:#FFAA33;font-size:11px">⚠ não escolheu ainda</span>';
+    }
+
+    const renewalBadge = m.mp_subscription_status === 'cancelled_no_renew'
+      ? '<span style="font-size:10px;color:#FFAA33">não renova</span>'
+      : (m.plan !== 'free' && m.mp_subscription_status ? '<span style="font-size:10px;color:var(--green)">renovando</span>' : '');
+
+    return `
+    <tr>
+      <td><strong>${m.full_name || '—'}</strong></td>
+      <td style="font-size:12px;color:var(--text-2)">${m.email}</td>
+      <td><span class="badge ${m.plan}">${planLabel(m.plan)}</span></td>
+      <td style="font-size:14px">${sportsDisplay}</td>
+      <td style="font-size:12px;color:var(--text-2)">${m.plan_expires_at ? fmtDate(m.plan_expires_at) : '—'}<br>${renewalBadge}</td>
+      <td>
+        <select style="padding:4px 8px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:12px;cursor:pointer"
+          onchange="updateMemberPlan('${m.id}', this.value)">
+          <option value="free"    ${m.plan==='free'?'selected':''}>Free</option>
+          <option value="starter" ${m.plan==='starter'?'selected':''}>Starter</option>
+          <option value="pro"     ${m.plan==='pro'?'selected':''}>Pro</option>
+          <option value="vip"     ${m.plan==='vip'?'selected':''}>VIP</option>
+        </select>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterMembersTable(q) {
+  const filtered = ALL_MEMBERS.filter(m =>
+    m.email.toLowerCase().includes(q.toLowerCase()) ||
+    (m.full_name || '').toLowerCase().includes(q.toLowerCase())
+  );
+  renderMembersTable(filtered);
+}
+
+async function updateMemberPlan(userId, plan) {
+  const updates = { plan, plan_started_at: new Date().toISOString() };
+
+  // Ao ativar manualmente Starter ou Pro sem categorias definidas, evita deixar
+  // o membro sem nenhum esporte liberado — define um conjunto padrão razoável.
+  // Importante: NÃO marca sports_last_changed_at aqui, porque essa é uma escolha
+  // padrão do sistema, não uma escolha real do membro — ele precisa poder trocar
+  // imediatamente, sem ficar travado 30 dias por algo que nunca decidiu.
+  const member = ALL_MEMBERS.find(m => m.id === userId);
+  if (plan === 'starter' && (!member?.starter_categories || member.starter_categories.length === 0)) {
+    updates.starter_categories = ['football', 'basketball'];
+  }
+  if (plan === 'pro' && (!member?.pro_categories || member.pro_categories.length === 0)) {
+    updates.pro_categories = ['football', 'basketball', 'baseball', 'nfl'];
+  }
+
+  await sb.from('profiles').update(updates).eq('id', userId);
+  await loadMembers();
+  showAdminToast('Plano atualizado', 'O membro já tem acesso liberado. Ele pode trocar os esportes em "Minha Conta".');
+}
+
+// ═══════════════════════════════════════════════
+// REPORT
+// ═══════════════════════════════════════════════
+async function generateReport() {
+  const start = document.getElementById('rep-start').value;
+  const end   = document.getElementById('rep-end').value;
+  if (!start || !end) return;
+
+  const { data: signals } = await sb.from('signals')
+    .select('*, leagues(name)')
+    .gte('match_date', start)
+    .lte('match_date', end + 'T23:59:59')
+    .in('status', ['green','red','void'])
+    .order('match_date');
+
+  if (!signals?.length) {
+    document.getElementById('report-output').textContent = 'Nenhum sinal com resultado neste período.';
+    return;
+  }
+
+  const greens = signals.filter(s => s.status === 'green');
+  const reds   = signals.filter(s => s.status === 'red');
+  const voids  = signals.filter(s => s.status === 'void');
+  const units  = signals.reduce((a, s) => a + Number(s.profit_units || 0), 0);
+  const decided = signals.length - voids.length;
+  const wr     = decided > 0 ? ((greens.length / decided) * 100).toFixed(1) : '0.0';
+
+  const startLabel = new Date(start).toLocaleDateString('pt-BR', { day:'2-digit', month:'short' });
+  const endLabel   = new Date(end).toLocaleDateString('pt-BR', { day:'2-digit', month:'short' });
+
+  const highlightsText = greens.length
+    ? greens.slice(0,3).map(s => `• ${s.match_name} — +${((s.odd-1)*s.stake).toFixed(2)}u ✅`).join('\n')
+    : '• Nenhum green nesse período — semana de ajuste, voltamos mais fortes 💪';
+
+  let report = `📊 CASHCLUB — SEMANA ${startLabel} a ${endLabel}
+
+✅ Greens: ${greens.length}
+❌ Reds: ${reds.length}
+⚪ Voids: ${voids.length}
+🎯 Taxa de acerto: ${wr}%
+📈 Resultado: ${units >= 0 ? '+' : ''}${units.toFixed(2)} unidades
+
+🏆 DESTAQUES:
+${highlightsText}
+
+💡 Mais sinais todo dia.
+Acesse cashclub.joaoreche9.workers.dev e garanta seu plano.
+
+#CashClub #Apostas #Tips #Futebol #NBA #NFL`;
+
+  document.getElementById('report-output').textContent = report;
+}
+
+function copyReport() {
+  const text = document.getElementById('report-output').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copiado! ✅';
+    setTimeout(() => btn.textContent = 'Copiar texto', 2000);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// UTIL
+// ═══════════════════════════════════════════════
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `alert ${type} show`;
+  setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+function showAdminToast(title, sub) {
+  let container = document.getElementById('admin-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'admin-toast-container';
+    container.style.cssText = 'position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:999;';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.style.cssText = 'background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:12px 16px;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:translateX(120%);transition:transform .35s cubic-bezier(.4,0,.2,1);';
+  toast.innerHTML = `<div style="font-size:13px;font-weight:600;color:var(--text)">${title}</div><div style="font-size:11px;color:var(--text-2);margin-top:2px">${sub}</div>`;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.style.transform = 'translateX(0)');
+  setTimeout(() => {
+    toast.style.transform = 'translateX(120%)';
+    setTimeout(() => toast.remove(), 400);
+  }, 4000);
+}
+
+// ═══════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
